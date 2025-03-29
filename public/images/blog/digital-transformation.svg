@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="500" fill="#f0f6ff"/>
+  <g opacity="0.1">
+    <rect x="0" y="0" width="800" height="500" fill="#1B3C68"/>
+  </g>
+  
+  <!-- Digital transformation flow diagram -->
+  <g transform="translate(250, 140)">
+    <!-- Central hub with pulse animation -->
+    <circle cx="150" cy="150" r="50" fill="#1B3C68" opacity="0.8">
+      <animate attributeName="r" values="50;54;50" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;0.9;0.7" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    
+    <circle cx="150" cy="150" r="40" fill="#65D80D" opacity="0.6">
+      <animate attributeName="r" values="40;44;40" dur="5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0.7;0.5" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Connecting nodes with rotation animation -->
+    <g>
+      <animateTransform attributeName="transform" 
+                        type="rotate" 
+                        values="0 150 150; 360 150 150" 
+                        dur="30s" 
+                        repeatCount="indefinite"/>
+      
+      <!-- Node 1 with its own pulse -->
+      <circle cx="150" cy="50" r="20" fill="#1B3C68" opacity="0.6">
+        <animate attributeName="r" values="20;22;20" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="150" y1="90" x2="150" y2="110" stroke="#65D80D" stroke-width="2" stroke-dasharray="5,5">
+        <animate attributeName="stroke-dashoffset" values="0;20" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      
+      <!-- Node 2 with its own pulse -->
+      <circle cx="250" cy="150" r="20" fill="#1B3C68" opacity="0.6">
+        <animate attributeName="r" values="20;22;20" dur="3.5s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="190" y1="150" x2="210" y2="150" stroke="#65D80D" stroke-width="2" stroke-dasharray="5,5">
+        <animate attributeName="stroke-dashoffset" values="0;20" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      
+      <!-- Node 3 with its own pulse -->
+      <circle cx="150" cy="250" r="20" fill="#1B3C68" opacity="0.6">
+        <animate attributeName="r" values="20;22;20" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="150" y1="190" x2="150" y2="210" stroke="#65D80D" stroke-width="2" stroke-dasharray="5,5">
+        <animate attributeName="stroke-dashoffset" values="0;20" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      
+      <!-- Node 4 with its own pulse -->
+      <circle cx="50" cy="150" r="20" fill="#1B3C68" opacity="0.6">
+        <animate attributeName="r" values="20;22;20" dur="4.5s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="90" y1="150" x2="110" y2="150" stroke="#65D80D" stroke-width="2" stroke-dasharray="5,5">
+        <animate attributeName="stroke-dashoffset" values="0;20" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+    </g>
+  </g>
+  
+  <!-- Digital particles floating around -->
+  <g>
+    <!-- Particle 1 -->
+    <circle cx="200" cy="150" r="3" fill="#65D80D" opacity="0.7">
+      <animate attributeName="cx" values="200;220;200" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="150;170;150" dur="8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;0.3;0.7" dur="8s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Particle 2 -->
+    <circle cx="500" cy="250" r="4" fill="#65D80D" opacity="0.6">
+      <animate attributeName="cx" values="500;520;500" dur="7s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="250;230;250" dur="7s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="7s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Particle 3 -->
+    <circle cx="600" cy="350" r="3" fill="#65D80D" opacity="0.5">
+      <animate attributeName="cx" values="600;580;600" dur="9s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="350;370;350" dur="9s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="9s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Particle 4 -->
+    <circle cx="300" cy="400" r="4" fill="#65D80D" opacity="0.7">
+      <animate attributeName="cx" values="300;320;300" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="400;380;400" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;0.3;0.7" dur="6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Binary data elements with fading -->
+  <g font-family="monospace" font-size="8" fill="#1B3C68">
+    <text x="150" y="100" opacity="0.7">
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="4s" repeatCount="indefinite"/>
+      010101
+    </text>
+    <text x="150" y="120" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.5s" repeatCount="indefinite"/>
+      111000
+    </text>
+    
+    <text x="600" y="120" opacity="0.7">
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.5s" repeatCount="indefinite"/>
+      101010
+    </text>
+    <text x="600" y="140" opacity="0.6">
+      <animate attributeName="opacity" values="0.4;0.6;0.4" dur="4.5s" repeatCount="indefinite"/>
+      001101
+    </text>
+    
+    <text x="550" y="300" opacity="0.7">
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="5s" repeatCount="indefinite"/>
+      110011
+    </text>
+    <text x="550" y="320" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.7;0.3" dur="4s" repeatCount="indefinite"/>
+      001101
+    </text>
+    
+    <text x="150" y="350" opacity="0.7">
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="4.5s" repeatCount="indefinite"/>
+      111000
+    </text>
+    <text x="150" y="370" opacity="0.6">
+      <animate attributeName="opacity" values="0.4;0.6;0.4" dur="5.5s" repeatCount="indefinite"/>
+      010101
+    </text>
+  </g>
+  
+  <!-- Connected devices icons with subtle animations -->
+  <g transform="translate(600, 200)">
+    <!-- Laptop -->
+    <rect x="0" y="0" width="40" height="30" rx="2" fill="#1B3C68">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="0" y="30" width="40" height="5" rx="2" fill="#1B3C68"/>
+    <rect x="5" y="5" width="30" height="20" fill="#65D80D" opacity="0.6">
+      <animate attributeName="opacity" values="0.5;0.7;0.5" dur="3s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <g transform="translate(150, 200)">
+    <!-- Mobile phone -->
+    <rect x="0" y="0" width="20" height="40" rx="3" fill="#1B3C68">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="2" y="5" width="16" height="25" fill="#65D80D" opacity="0.6">
+      <animate attributeName="opacity" values="0.5;0.7;0.5" dur="4s" repeatCount="indefinite"/>
+    </rect>
+    <circle cx="10" cy="35" r="2" fill="#ffffff"/>
+  </g>
+  
+  <rect x="150" y="80" width="500" height="60" rx="10" fill="#ffffff" opacity="0.9"/>
+  <text x="400" y="120" font-family="Arial" font-size="24" fill="#1B3C68" text-anchor="middle" font-weight="bold">Digital Transformation Guide</text>
+</svg> 
