@@ -126,36 +126,6 @@ export default function Home() {
           {/* Floating Elements */}
           {isMounted && (
             <>
-              {/* Data Streams */}
-              <motion.div 
-                className="absolute top-1/4 right-[10%] w-80 h-60"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.5 }}
-              >
-                {[...Array(10)].map((_, i) => (
-                  <motion.div
-                    key={`data-stream-${i}`}
-                    className="absolute h-0.5 rounded-full bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)]"
-                    style={{
-                      top: `${15 + i * 6}%`,
-                      left: '0%',
-                      width: `${30 + Math.floor(i / 2) * 10}%`,
-                    }}
-                    animate={{
-                      left: ["0%", "100%", "0%"],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 4 + i * 0.8,
-                      repeat: Infinity,
-                      ease: "linear",
-                      delay: i * 0.2,
-                    }}
-                  />
-                ))}
-              </motion.div>
-              
               {/* Server Stack */}
               <motion.div
                 className="absolute bottom-[10%] left-[15%] w-20 h-32 bg-gradient-to-b from-[#1B3C68] to-[#0d1117] rounded-md flex flex-col overflow-hidden"
