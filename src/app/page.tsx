@@ -1,1010 +1,584 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
-import { 
-  ArrowRight, 
-  HardDrive, 
-  Cloud, 
-  Shield, 
-  Code, 
-  LineChart, 
-  Headphones, 
-  Check, 
-  Users, 
-  Clock, 
-  Award, 
-  ChevronRight, 
-  Star,
-  Plus,
-  Smartphone,
-  BarChart3,
-  Network,
-  User
-} from "lucide-react";
-import { RevealText } from "@/components/ui/reveal-text";
-import { ParallaxSection } from "@/components/ui/parallax-section";
-import { Animated3DCard } from "@/components/ui/animated-3d-card";
-import { ClientOnlyTestimonials } from "@/components/ui/client-only-testimonials";
-import { ReactNode } from "react";
-
-// Creating a reusable animated border component for white boxes (copied from about page)
-const AnimatedBorder = ({ children, className = "" }: { children: ReactNode; className?: string }) => {
-  return (
-    <div className={`relative rounded-2xl ${className}`}>
-      {/* The animated border */}
-      <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-[rgb(97,224,0)]/40 to-[rgb(0,218,222)]/40 opacity-70 blur-[2px] group-hover:opacity-100 transition-opacity"></div>
-      <motion.div 
-        className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-[rgb(97,224,0)]/30 to-[rgb(0,218,222)]/30"
-        animate={{
-          backgroundPosition: ['0% 0%', '100% 100%'],
-          rotate: [0, 0.5, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          repeatType: 'reverse',
-          ease: 'linear',
-        }}
-      />
-      <div className="relative bg-white rounded-2xl h-full z-10">
-        {children}
-      </div>
-    </div>
-  );
-};
+import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import AnimatedCard from '@/components/AnimatedCard';
 
 export default function Home() {
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
-  const rotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
-    
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in');
+          observerRef.current?.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach(el => {
+      observerRef.current?.observe(el);
+    });
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (containerRef.current) {
-        const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-        const x = (e.clientX - left) / width - 0.5;
-        const y = (e.clientY - top) / height - 0.5;
-        setMousePosition({ x, y });
-      }
+      setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      observerRef.current?.disconnect();
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
-  const testimonials = [
-    {
-      quote: "Premium Infotech transformed our IT infrastructure, resulting in a 40% increase in operational efficiency and significant cost savings. Their team's expertise and dedication have made them an invaluable partner for our business.",
-      name: "Sarah Johnson",
-      designation: "CTO, Global Innovations"
-    },
-    {
-      quote: "Working with Premium Infotech has been a game-changer for our company. Their cloud migration services were seamless, and their ongoing support has been exceptional. I highly recommend their services to any business looking to modernize their IT systems.",
-      name: "Michael Chen",
-      designation: "Operations Director, TechStart Inc."
-    },
-    {
-      quote: "The cybersecurity solutions provided by Premium Infotech have given us peace of mind. Their proactive approach to threat detection and their quick response times have protected our business from several potential incidents.",
-      name: "Amanda Wilson",
-      designation: "Security Manager, DataSecure Ltd."
-    }
-  ];
-
   return (
-    <div ref={containerRef} className="overflow-x-hidden min-h-screen relative">
-      {/* Background decorative elements - Now handled in layout */}
-      
-      {/* Hero Section - Reimagined with 3D grid and tech elements */}
-      <section className="relative min-h-[100vh] flex items-center overflow-hidden px-4 sm:px-6 pt-6 sm:pt-10 md:pt-0">
-        {/* Tech Grid Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0d1117] via-[#161c26] to-[#1B3C68]/80"></div>
-          
-          {/* Animated 3D Grid */}
-          <div className="absolute inset-0 perspective-1000">
-            <motion.div 
-              className="absolute inset-0 bg-grid-3d opacity-20"
-              animate={{
-                backgroundPosition: ["0% 0%", "100% 100%"],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          </div>
-          
-          {/* Floating Elements */}
-          {isMounted && (
-            <>
-              {/* Server Stack */}
-              <motion.div
-                className="absolute bottom-[10%] left-[15%] w-20 h-32 bg-gradient-to-b from-[#1B3C68] to-[#0d1117] rounded-md flex flex-col overflow-hidden"
-                initial={{ y: 100, opacity: 0 }}
-                animate={{ y: 0, opacity: 0.7 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                {[...Array(5)].map((_, i) => (
-                  <motion.div
-                    key={`server-${i}`}
-                    className="w-full h-5 mt-1 border-t border-[rgb(97,224,0)]/20 flex items-center px-2"
-                    animate={{
-                      borderColor: ["rgba(97,224,0,0.2)", "rgba(0,218,222,0.6)", "rgba(97,224,0,0.2)"],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      delay: i * 0.7,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <motion.div 
-                      className="w-2 h-2 rounded-full bg-[rgb(97,224,0)]"
-                      animate={{
-                        opacity: [0.3, 1, 0.3],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        delay: i * 0.3,
-                        repeatType: "reverse"
-                      }}
-                    />
-                    <motion.div 
-                      className="w-4 h-1 ml-1 bg-[rgb(0,218,222)]/60 rounded-full"
-                      animate={{
-                        width: ["16px", "8px", "16px"],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        delay: i * 0.2,
-                      }}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
+    <main className="flex flex-col items-center">
+      {/* Hero Section */}
+      <section className="w-full bg-background py-20 md:py-32 px-4 flex flex-col items-center justify-center min-h-[90vh] relative overflow-hidden">
+        {/* Animated shapes */}
+        <div 
+          className="absolute w-64 h-64 rounded-full bg-primary/10 blur-3xl" 
+          style={{ 
+            left: `${mousePosition.x / 20}px`, 
+            top: `${mousePosition.y / 20}px`,
+            transition: 'all 0.6s var(--transition-ease)'
+          }}
+        ></div>
+        <div 
+          className="absolute w-96 h-96 rounded-full bg-secondary/20 blur-3xl -right-48 top-20"
+          style={{ 
+            transform: `translateY(${mousePosition.y / 80}px)`,
+            transition: 'all 0.8s var(--transition-ease)'
+          }}
+        ></div>
+        <div 
+          className="absolute w-80 h-80 rounded-full bg-primary/10 blur-3xl -left-40 bottom-20"
+          style={{ 
+            transform: `translateX(${mousePosition.x / 80}px)`,
+            transition: 'all 0.8s var(--transition-ease)'
+          }}
+        ></div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 text-left space-y-6 mb-12 md:mb-0">
+              <div className="flex items-center mb-4 hero-breadcrumb">
+                <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-heading-color text-sm font-medium">
+                  Innovative IT Solutions
+                </span>
+              </div>
               
-              {/* Floating Orbs */}
-              {[...Array(8)].map((_, i) => {
-                const size = 8 + (i % 3) * 8;
-                return (
-                  <motion.div
-                    key={`orb-${i}`}
-                    className={`absolute rounded-full bg-gradient-to-br ${i % 2 === 0 ? 'from-[rgb(97,224,0)]/40 to-transparent' : 'from-[rgb(0,218,222)]/40 to-transparent'}`}
-                    style={{
-                      width: size,
-                      height: size,
-                      top: `${20 + (i * 8) % 60}%`,
-                      left: `${5 + (i * 12) % 90}%`,
-                    }}
-                    animate={{
-                      y: [0, -20, 0],
-                      x: [0, i % 2 === 0 ? 15 : -15, 0],
-                      opacity: [0.4, 0.8, 0.4],
-                    }}
-                    transition={{
-                      duration: 5 + i,
-                      repeat: Infinity,
-                      repeatType: "reverse",
-                      ease: "easeInOut",
-                    }}
-                  />
-                );
-              })}
-            </>
-          )}
-        </div>
-        
-        <div className="container mx-auto px-4 z-10">
-          <div className="grid md:grid-cols-6 gap-8 lg:gap-4 items-center">
-            <div className="md:col-span-4 lg:col-span-3 order-1 lg:order-1">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-                className="max-w-2xl"
-              >
-                <motion.div 
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="inline-flex items-center px-4 py-1.5 rounded-full bg-gradient-to-r from-[rgb(97,224,0)]/10 to-[rgb(0,218,222)]/10 backdrop-blur-sm border border-[rgb(97,224,0)]/20 mb-6"
-                >
-                  <motion.div 
-                    animate={{ scale: [1, 1.3, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-2 h-2 rounded-full bg-[rgb(97,224,0)] mr-2"
-                  />
-                  <span className="text-[rgb(97,224,0)] caption">Premium IT Services</span>
-                </motion.div>
-                
-                <div className="relative mb-8">
-                  {["Transforming", "Business", "Through", "Digital", "Innovation"].map((word, i) => (
-                    <motion.div
-                      key={word}
-                      initial={{ y: 40, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ duration: 0.8, delay: 0.1 * i }}
-                      className={`${i === 1 || i === 4 ? 'text-transparent bg-clip-text bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)]' : 'text-white'} heading-1 inline-block mr-4 mb-2`}
-                    >
-                      {word}
-                    </motion.div>
-                  ))}
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight hero-title text-foreground">
+                Tech <span className="text-heading-color">Excellence</span> For Your Business
+              </h1>
+              
+              <div className="hero-decorative-line"></div>
+              
+              <p className="text-xl md:text-2xl hero-description text-text-secondary">
+                Strategic IT consultancy and cutting-edge technology services tailored to help modern businesses thrive in the digital age.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 mt-6 hero-description">
+                <Link href="/contact" className="gradient-button py-4 px-8 font-medium text-lg">
+                  Get Started
+                </Link>
+                <Link href="/services" className="py-4 px-8 border border-text-secondary/20 rounded-full font-medium text-lg hover:bg-secondary hover:text-foreground hover:border-transparent transition-colors text-text-secondary">
+                  Explore Services
+                </Link>
+              </div>
+              
+              <div className="flex items-center gap-4 mt-8 hero-badge">
+                <div className="bg-background p-2 rounded-full border border-text-secondary/10">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-heading-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
-                
-                <motion.p
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
-                  className="body-large text-gray-300 mb-8 max-w-xl"
-                >
-                  Comprehensive enterprise IT solutions designed to optimize your operations, 
-                  enhance security, and accelerate growth in today's digital landscape.
-                </motion.p>
-                
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.8 }}
-                  className="flex flex-col sm:flex-row gap-4 mt-8"
-                >
-                  <Link href="/contact">
-                    <motion.button 
-                      whileHover={{ scale: 1.03, boxShadow: "0 0 15px rgba(97, 224, 0, 0.5)" }}
-                      whileTap={{ scale: 0.98 }}
-                      className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] rounded-lg text-white shadow-lg group"
-                    >
-                      <span className="relative flex items-center">
-                        Schedule a Consultation
-                        <motion.div
-                          animate={{ x: [0, 5, 0] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </motion.div>
-                      </span>
-                    </motion.button>
-                  </Link>
-                  
-                  <Link href="/services">
-                    <motion.button 
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all border border-[rgb(97,224,0)]/30 rounded-lg text-[rgb(97,224,0)] hover:bg-[rgb(97,224,0)]/5"
-                    >
-                      <span className="relative flex items-center">
-                        Explore Services
-                      </span>
-                    </motion.button>
-                  </Link>
-                </motion.div>
-              </motion.div>
+                <div>
+                  <p className="text-sm text-text-secondary opacity-80">Trusted by</p>
+                  <p className="font-semibold text-foreground">500+ Businesses</p>
+                </div>
+              </div>
             </div>
             
-            <div className="md:col-span-2 lg:col-span-3 order-2 lg:order-2 relative mt-10 md:mt-10 lg:mt-0">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="relative"
-              >
-                {/* Redesigned Support Dashboard */}
-                <div className="relative w-full md:w-[110%] lg:w-full h-[300px] md:h-[450px]">
-                  <motion.div 
-                    animate={{ 
-                      y: [0, -5, 0],
-                    }}
-                    transition={{ 
-                      duration: 4, 
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                    className="w-full h-full relative"
-                  >
-                    {/* Main Dashboard Panel */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[280px] md:h-[350px] bg-gradient-to-r from-[#1B3C68]/95 to-[#2a4a75]/95 rounded-xl overflow-hidden shadow-2xl border border-[rgb(97,224,0)]/20">
-                      {/* Dashboard Header */}
-                      <div className="bg-[#111827]/90 py-3 px-4 flex justify-between items-center border-b border-[rgb(97,224,0)]/20">
-                        <div className="flex items-center">
-                          <div className="h-3 w-3 rounded-full bg-[rgb(97,224,0)] mr-2"></div>
-                          <span className="text-white text-xs font-medium tracking-wider">PREMIUM INFOTECH LLC GLOBAL SUPPORT</span>
-                        </div>
-                        <div className="flex items-center">
-                          <motion.div 
-                            animate={{ opacity: [0.5, 1, 0.5] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="h-2 w-2 rounded-full bg-[rgb(97,224,0)] mr-1"
-                          />
-                          <span className="text-[rgb(97,224,0)] text-xs">LIVE</span>
-                        </div>
-                      </div>
-                      
-                      {/* Dashboard Content - Redesigned with stats left, messages right */}
-                      <div className="p-4 h-[calc(100%-48px)]">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
-                          {/* Stats Column - Left side on desktop, top on mobile */}
-                          <div className="md:col-span-1 h-full">
-                            <div className="h-full bg-black/20 backdrop-blur-sm rounded-lg p-3 border border-[rgb(97,224,0)]/10 flex flex-col">
-                              <div className="text-white text-xs mb-3 flex justify-between">
-                                <span>SUPPORT STATUS</span>
-                                <motion.span 
-                                  animate={{ color: ['#61E000', '#00DADE', '#61E000'] }}
-                                  transition={{ duration: 3, repeat: Infinity }}
-                                >
-                                  ACTIVE
-                                </motion.span>
-                              </div>
-                              
-                              {/* Support Metrics - Stacked vertically */}
-                              <div className="grid grid-cols-2 gap-3 mb-auto">
-                                {[
-                                  { label: "Response Time", value: "2m", color: "rgb(97,224,0)" },
-                                  { label: "Agents Online", value: "24", color: "rgb(0,218,222)" },
-                                  { label: "Open Tickets", value: "12", color: "rgb(97,224,0)" },
-                                  { label: "Uptime", value: "99.9%", color: "rgb(0,218,222)" }
-                                ].map((metric, i) => (
-                                  <div key={i} className="mb-2">
-                                    <div className="flex flex-col">
-                                      <span className="text-gray-300 text-xs">{metric.label}</span>
-                                      <span style={{ color: metric.color }} className="text-lg font-bold">{metric.value}</span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                              
-                              {/* Status Bar */}
-                              <div className="flex items-center mt-auto pt-2 border-t border-white/10">
-                                <motion.div 
-                                  animate={{ scale: [1, 1.3, 1] }}
-                                  transition={{ duration: 2, repeat: Infinity }}
-                                  className="w-1.5 h-1.5 rounded-full bg-[rgb(97,224,0)] mr-1.5"
-                                />
-                                <span className="text-white text-xs">24/7 SUPPORT</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Chat Column - Right side on desktop, bottom on mobile */}
-                          <div className="md:col-span-2 h-full">
-                            <div className="h-full bg-black/20 backdrop-blur-sm rounded-lg p-3 border border-[rgb(97,224,0)]/10 flex flex-col">
-                              <div className="text-white text-xs mb-3 flex justify-between items-center">
-                                <span className="px-2 py-1 bg-[#1B3C68]/60 rounded-full">LIVE SUPPORT CHAT</span>
-                                <span className="text-[rgb(0,218,222)]">3 MINUTES AGO</span>
-                              </div>
-                              
-                              {/* Support Chat Interface */}
-                              <div className="flex-grow overflow-auto">
-                                <div className="flex flex-col gap-2">
-                                  <div className="flex items-start gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#1B3C68] flex items-center justify-center">
-                                      <Users className="h-3 w-3 text-white" />
-                                    </div>
-                                    <div className="bg-[#1B3C68]/60 rounded-lg rounded-tl-none p-2 max-w-[80%]">
-                                      <p className="text-white text-xs">How can I help you with your IT support needs today?</p>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="flex items-start gap-2 justify-end">
-                                    <div className="bg-gradient-to-r from-[rgb(97,224,0)]/70 to-[rgb(0,218,222)]/70 rounded-lg rounded-tr-none p-2 max-w-[80%]">
-                                      <p className="text-white text-xs">We need help with cybersecurity planning.</p>
-                                    </div>
-                                    <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                                      <User className="h-3 w-3 text-white" />
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="flex items-start gap-2">
-                                    <div className="w-6 h-6 rounded-full bg-[#1B3C68] flex items-center justify-center">
-                                      <Users className="h-3 w-3 text-white" />
-                                    </div>
-                                    <div className="bg-[#1B3C68]/60 rounded-lg rounded-tl-none p-2 max-w-[80%]">
-                                      <p className="text-white text-xs">I'd be happy to discuss our cybersecurity solutions and create a custom plan for your organization.</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Input Field */}
-                              <div className="flex mt-3 gap-2 items-center">
-                                <div className="flex-grow bg-black/30 rounded-full px-3 py-1.5 text-white/50 text-xs">
-                                  Type your message...
-                                </div>
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] flex items-center justify-center">
-                                  <ArrowRight className="h-3.5 w-3.5 text-white" />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+            <div className="md:w-1/2 relative">
+              <div className="relative w-full h-[400px] md:h-[500px]">
+                {/* Abstract SVG shapes */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <svg viewBox="0 0 500 500" width="100%" height="100%" className="hero-shape hero-shape-1">
+                    <path d="M388.5,146.2c25.1,39.3,26.4,93.9,7.7,139.4c-18.6,45.5-57.2,81.9-105.7,96.9c-48.4,15-106.7,8.5-151.3-19.4c-44.6-27.9-75.5-77.3-71.9-126.8c3.6-49.5,41.7-99.2,91.4-121.8c49.6-22.6,110.8-18.2,156.7,7.7C361.3,141.9,392,121.3,388.5,146.2z" fill="rgba(105, 117, 101, 0.1)" />
+                  </svg>
+                  <svg viewBox="0 0 500 500" width="90%" height="90%" className="hero-shape hero-shape-2">
+                    <path d="M389.7,268.2c-20.1,42.5-40.2,85-82.1,105.9c-41.9,21-105.5,20.5-147.1-6.9c-41.6-27.3-61.1-81.6-48.7-128.6c12.5-47,56.8-86.7,104.6-100.5c47.9-13.8,99.2-1.5,134,30.5C385.2,198.5,403.6,240.3,389.7,268.2z" fill="rgba(60, 61, 55, 0.15)" />
+                  </svg>
+                  <svg viewBox="0 0 500 500" width="80%" height="80%" className="hero-shape hero-shape-3">
+                    <path d="M343.7,96.3c35.7,30.3,55.6,79.6,44.9,121.4c-10.7,41.8-52.1,76.2-97.6,89.5c-45.5,13.4-95,5.6-132.4-21.9c-37.3-27.5-62.5-74.7-57.5-118.9c5-44.2,40.1-85.4,84.9-99.4c44.8-14.1,99.3-1,139.2,22.1C325.1,89.1,322,78.3,343.7,96.3z" fill="rgba(236, 223, 204, 0.1)" />
+                  </svg>
                 </div>
-              </motion.div>
+                
+                {/* Tech elements */}
+                <div className="absolute top-1/4 left-1/4 w-16 h-16 bg-primary rounded-xl flex items-center justify-center transform rotate-12 shadow-lg hero-float-element" style={{animationDelay: '0.2s'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                
+                <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-secondary rounded-full flex items-center justify-center shadow-lg hero-float-element" style={{animationDelay: '0.5s'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                
+                <div className="absolute top-20 right-16 w-16 h-16 bg-secondary/30 backdrop-blur-sm rounded-lg flex items-center justify-center transform rotate-45 shadow-lg hero-float-element" style={{animationDelay: '0.3s'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* Bottom Curve */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 overflow-hidden">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="absolute bottom-0 w-full h-full">
-            <motion.path 
-              d="M0,0 C150,90 350,0 500,100 C650,190 750,100 900,50 C1050,10 1150,40 1200,80 L1200,120 L0,120 Z" 
-              className="fill-[#f9fafb] opacity-5"
-              animate={{
-                d: [
-                  "M0,0 C150,90 350,0 500,100 C650,190 750,100 900,50 C1050,10 1150,40 1200,80 L1200,120 L0,120 Z",
-                  "M0,0 C150,40 350,90 500,60 C650,30 750,70 900,110 C1050,140 1150,90 1200,70 L1200,120 L0,120 Z",
-                  "M0,0 C150,90 350,0 500,100 C650,190 750,100 900,50 C1050,10 1150,40 1200,80 L1200,120 L0,120 Z",
-                ],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          </svg>
+      </section>
+
+      {/* Services Overview */}
+      <section className="w-full py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 animate-on-scroll opacity-0 text-custom-heading">
+            Our Core Services
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <AnimatedCard className="card-custom p-8 h-full">
+              <div className="flex flex-col h-full">
+                <div className="rounded-full bg-primary/10 w-14 h-14 flex items-center justify-center mb-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-3 parallax-content text-custom-heading">Strategic IT Planning</h3>
+                <p className="text-foreground flex-grow parallax-content">
+                  Align your technology with business goals through comprehensive IT strategy and roadmapping.
+                </p>
+                <Link href="/services#strategic-it" className="mt-6 text-primary hover:text-primary-hover flex items-center parallax-content">
+                  Learn more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
+              </div>
+            </AnimatedCard>
+
+            <AnimatedCard className="card-custom p-8 h-full">
+              <div className="flex flex-col h-full">
+                <div className="rounded-full bg-primary/10 w-14 h-14 flex items-center justify-center mb-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-3 parallax-content text-custom-heading">Cloud Computing Solutions</h3>
+                <p className="text-foreground flex-grow parallax-content">
+                  Seamlessly migrate to the cloud with our expert guidance on implementation and management.
+                </p>
+                <Link href="/services#cloud" className="mt-6 text-primary hover:text-primary-hover flex items-center parallax-content">
+                  Learn more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
+              </div>
+            </AnimatedCard>
+
+            <AnimatedCard className="card-custom p-8 h-full">
+              <div className="flex flex-col h-full">
+                <div className="rounded-full bg-primary/10 w-14 h-14 flex items-center justify-center mb-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-3 parallax-content text-custom-heading">Cybersecurity Consulting</h3>
+                <p className="text-foreground flex-grow parallax-content">
+                  Protect your digital assets with comprehensive security assessments and solutions.
+                </p>
+                <Link href="/services#cybersecurity" className="mt-6 text-primary hover:text-primary-hover flex items-center parallax-content">
+                  Learn more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
+              </div>
+            </AnimatedCard>
+
+            <AnimatedCard className="card-custom p-8 h-full">
+              <div className="flex flex-col h-full">
+                <div className="rounded-full bg-primary/10 w-14 h-14 flex items-center justify-center mb-6">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-3 parallax-content text-custom-heading">IT Support Services</h3>
+                <p className="text-foreground flex-grow parallax-content">
+                  24/7 technical assistance for all your IT needs with rapid response times and expert problem resolution.
+                </p>
+                <Link href="/services#support" className="mt-6 text-primary hover:text-primary-hover flex items-center parallax-content">
+                  Learn more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
+              </div>
+            </AnimatedCard>
+          </div>
+          
+          <div className="text-center mt-16">
+            <Link href="/services" className="py-3 px-8 border border-foreground/20 rounded-full font-medium hover:bg-background hover:border-foreground/40 transition-colors animate-on-scroll opacity-0 text-foreground">
+              View All Services
+            </Link>
+          </div>
         </div>
       </section>
-      
-      {/* Services Section - Copied from About Page */}
-      <section className="py-20 relative light-bg px-4 sm:px-6">
-        <div id="services" className="container mx-auto px-4 py-16 max-w-[1280px]">
-          <RevealText className="text-center mb-12">
-            <h2 className="heading-2 text-[#1B3C68] mb-4">
-              Powering Business <span className="bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] bg-clip-text text-transparent">Excellence</span>
+
+      {/* Why Choose Us Section */}
+      <section className="w-full py-24 px-4 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-heading-color animate-on-scroll opacity-0">
+              Why Choose GoFirst Tech
             </h2>
-            <p className="body-large max-w-2xl mx-auto">
-              Comprehensive IT solutions designed to optimize operations, enhance security, and accelerate your growth
+            <p className="mt-4 text-lg text-text-secondary max-w-3xl mx-auto animate-on-scroll opacity-0">
+              We combine technical expertise with business acumen to deliver solutions that drive measurable results
             </p>
-          </RevealText>
+          </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: <Headphones className="h-10 w-10" />,
-                title: "Help Desk Support",
-                description: "On-demand IT help for employees via chat, email, or call with tiered support for different complexity levels."
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                ),
+                title: 'Fast Response',
+                description: 'Our team responds to support requests within 1 hour, ensuring minimal downtime for your business.'
               },
               {
-                icon: <Cloud className="h-10 w-10" />,
-                title: "Cloud Services Support",
-                description: "Managing cloud platforms including Microsoft 365, Google Workspace, AWS, and Azure with backup and migration assistance."
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                ),
+                title: 'Security First',
+                description: 'We implement industry-leading security practices to protect your valuable business data.'
               },
               {
-                icon: <Shield className="h-10 w-10" />,
-                title: "Cybersecurity Monitoring",
-                description: "Comprehensive threat detection, firewall setup, security audits, and employee training for security awareness."
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                ),
+                title: 'Expert Team',
+                description: 'Our certified professionals bring decades of combined experience across all major technology platforms.'
               },
               {
-                icon: <HardDrive className="h-10 w-10" />,
-                title: "Data Backup & Recovery",
-                description: "Setting up automated backup systems and efficient restoration of lost or corrupted data when needed."
-              },
-              {
-                icon: <Smartphone className="h-10 w-10" />,
-                title: "Device Management",
-                description: "Remote management of all business devices with enforced security policies and timely updates."
-              },
-              {
-                icon: <BarChart3 className="h-10 w-10" />,
-                title: "IT Consulting & Planning",
-                description: "Strategic advice on tech upgrades, migrations, infrastructure setup, and regulatory compliance."
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                ),
+                title: 'Scalable Solutions',
+                description: 'Our infrastructure solutions grow with your business, eliminating costly overhauls down the line.'
               }
-            ].map((service, index) => (
-              <Animated3DCard 
-                key={index} 
-                className="backdrop-blur-md bg-white/60 h-full" 
-                borderRadius={20}
-                rotationIntensity={10}
-              >
-                <AnimatedBorder className="h-full">
-                  <div className="p-6 h-full flex flex-col">
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-[#65D80D] mb-4"
-                    >
-                      {service.icon}
-                    </motion.div>
-                    <RevealText delay={index * 0.05} className="flex-grow">
-                      <h3 className="subheading mb-3">{service.title}</h3>
-                      <p className="body">{service.description}</p>
-                    </RevealText>
+            ].map((item, index) => (
+              <div key={index} className="animate-on-scroll opacity-0">
+                <div className="bg-secondary p-8 rounded-2xl h-full flex flex-col items-center text-center">
+                  <div className="rounded-full bg-background p-4 mb-6 text-heading-color">
+                    {item.icon}
                   </div>
-                </AnimatedBorder>
-              </Animated3DCard>
+                  <h3 className="text-xl font-semibold mb-3 text-foreground">{item.title}</h3>
+                  <p className="text-text-secondary">{item.description}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
-      
-      {/* Call To Action - Moved to appear after services */}
-      <section className="py-20 relative overflow-hidden px-4 sm:px-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1B3C68] to-[#2a4a75]"></div>
-        <motion.div 
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "radial-gradient(circle at 30% 20%, rgba(97, 224, 0, 0.2), transparent 40%), radial-gradient(circle at 70% 60%, rgba(0, 218, 222, 0.2), transparent 40%)",
-          }}
-        />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-5xl mx-auto bg-white/10 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-white/20 shadow-xl">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <RevealText>
-                  <h2 className="heading-2 text-white mb-4">
-                    Ready to Transform Your IT Infrastructure?
-                  </h2>
-                </RevealText>
-                <RevealText delay={0.2}>
-                  <p className="body-large text-white mb-8">
-                    Contact us today for a free consultation and discover how our IT solutions can drive your business forward.
-                  </p>
-                </RevealText>
-              </div>
-              
-              <div className="relative">
-                <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
-                  <div className="flex items-center space-x-2 mb-6">
-                    {[1, 2, 3].map((i) => (
-                      <motion.div 
-                        key={i}
-                        animate={{ 
-                          y: [0, -8, 0] 
-                        }}
-                        transition={{ 
-                          duration: 1.5, 
-                          repeat: Infinity, 
-                          repeatType: "reverse",
-                          delay: i * 0.2,
-                          ease: "easeInOut"
-                        }}
-                        className="w-3 h-3 rounded-full bg-[rgb(97,224,0)]"
-                      />
+
+      {/* Tech Support Section */}
+      <section className="w-full py-24 px-4 bg-secondary">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+          <div className="lg:w-1/2 animate-on-scroll opacity-0">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-custom-heading">
+              24/7 IT Support <br/>when you need it
+            </h2>
+            <p className="text-custom text-lg mb-8">
+              Our team of certified technicians is available around the clock to resolve your IT issues quickly and efficiently.
+            </p>
+            <ul className="space-y-4 text-custom">
+              {[
+                'Remote troubleshooting for PCs and servers',
+                'Software installation & updates',
+                'Network setup & maintenance',
+                'Virus & malware removal'
+              ].map((item, i) => (
+                <li key={i} className="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/contact" className="gradient-button py-3 px-6 font-medium inline-block mt-8">
+              Contact Support
+            </Link>
+          </div>
+          <div className="lg:w-1/2 animate-on-scroll opacity-0">
+            <div className="relative h-[400px] w-full lg:h-[500px] rounded-xl overflow-hidden shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 z-10"></div>
+              <Image
+                src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                alt="IT Support Team"
+                fill
+                style={{ objectFit: 'cover' }}
+                className="z-0"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="w-full py-24 px-4 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-heading-color animate-on-scroll opacity-0">
+              What Our Clients Say
+            </h2>
+            <p className="mt-4 text-lg text-text-secondary max-w-3xl mx-auto animate-on-scroll opacity-0">
+              Success stories from businesses that transformed their operations with our IT solutions
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "GoFirst Tech revolutionized our IT infrastructure. Their cloud migration strategy cut our operational costs by 30% while improving system reliability.",
+                author: "Sarah Johnson",
+                position: "CTO, ReliableCorp Inc",
+                avatar: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-heading-color" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  </svg>
+                )
+              },
+              {
+                quote: "Their cybersecurity audit identified critical vulnerabilities we had no idea existed. Their team implemented robust solutions that have kept us secure for years.",
+                author: "Mark Reynolds",
+                position: "CEO, Financial Partners LLC",
+                avatar: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-heading-color" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  </svg>
+                )
+              },
+              {
+                quote: "Their 24/7 support team has been a lifesaver on multiple occasions. Response times are incredibly fast, and their staff is both knowledgeable and friendly.",
+                author: "Jessica Chen",
+                position: "Operations Director, TechStart",
+                avatar: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-heading-color" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  </svg>
+                )
+              }
+            ].map((testimonial, index) => (
+              <div key={index} className="animate-on-scroll opacity-0">
+                <div className="bg-secondary p-8 rounded-2xl h-full">
+                  <div className="flex mb-6">
+                    {Array(5).fill(0).map((_, i) => (
+                      <svg key={i} xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-heading-color" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
                     ))}
-                    <span className="text-white ml-2 body-small">Premium Infotech is responding...</span>
                   </div>
-                  
-                  <div className="space-y-4">
-                    <div className="bg-white/10 rounded-lg p-3 max-w-xs">
-                      <a href="https://Therencho.com" target="_blank" rel="noopener noreferrer" className="inline-block mb-1">
-                        <span className="text-xs text-white/80 hover:text-white transition-colors">The Rencho</span>
-                      </a>
-                      <p className="body-small text-white">I'm interested in improving our company's IT security. What services do you offer?</p>
+                  <blockquote className="text-foreground text-lg italic mb-6">"{testimonial.quote}"</blockquote>
+                  <div className="flex items-center">
+                    <div className="mr-4">
+                      {testimonial.avatar}
                     </div>
-                    
-                    <div className="bg-gradient-to-r from-[rgb(97,224,0)]/80 to-[rgb(0,218,222)]/80 rounded-lg p-3 ml-auto max-w-xs">
-                      <p className="body-small text-white">We offer comprehensive cybersecurity solutions including threat monitoring, penetration testing, and employee training.</p>
+                    <div>
+                      <p className="font-semibold text-foreground">{testimonial.author}</p>
+                      <p className="text-text-secondary text-sm">{testimonial.position}</p>
                     </div>
-                    
-                    <div className="bg-gradient-to-r from-[rgb(97,224,0)]/80 to-[rgb(0,218,222)]/80 rounded-lg p-3 ml-auto max-w-xs">
-                      <p className="body-small text-white">Our team can perform a security assessment to identify vulnerabilities and create a protection plan tailored to your needs.</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="w-full py-20 px-4 bg-secondary">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                number: "500+",
+                label: "Clients Served",
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                )
+              },
+              {
+                number: "99.9%",
+                label: "Uptime Guarantee",
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                )
+              },
+              {
+                number: "24/7",
+                label: "Technical Support",
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                )
+              },
+              {
+                number: "10+",
+                label: "Years of Experience",
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                )
+              }
+            ].map((stat, index) => (
+              <div key={index} className="animate-on-scroll opacity-0">
+                <div className="flex flex-col items-center text-center p-8">
+                  <div className="rounded-full bg-background p-4 mb-4 text-heading-color">
+                    {stat.icon}
+                  </div>
+                  <div className="text-4xl md:text-5xl font-bold text-foreground mb-2">{stat.number}</div>
+                  <div className="text-text-secondary">{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Case Studies Section */}
+      <section className="w-full py-24 px-4 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-heading-color animate-on-scroll opacity-0">
+              Client Success Stories
+            </h2>
+            <p className="mt-4 text-lg text-text-secondary max-w-3xl mx-auto animate-on-scroll opacity-0">
+              See how our IT solutions have transformed businesses across industries
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {[
+              {
+                title: "Healthcare Provider Increases Security & Compliance",
+                description: "A regional healthcare provider struggled with outdated security protocols and compliance concerns. Our team implemented a comprehensive security overhaul, resulting in HIPAA compliance and a 99.9% reduction in security incidents.",
+                results: ["HIPAA compliance achieved", "99.9% reduction in security incidents", "47% faster system performance", "Seamless patient data access"],
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                )
+              },
+              {
+                title: "Manufacturing Firm Reduces Downtime with Cloud Migration",
+                description: "A manufacturing company with multiple locations was experiencing significant downtime and data synchronization issues. We engineered a cloud migration strategy that improved system reliability and enabled real-time data across all facilities.",
+                results: ["98% reduction in system downtime", "Real-time data synchronization", "35% reduction in IT operational costs", "Improved production efficiency"],
+                icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                )
+              }
+            ].map((study, index) => (
+              <div key={index} className="animate-on-scroll opacity-0">
+                <div className="bg-secondary p-8 rounded-2xl h-full">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="md:w-1/4 flex justify-center md:justify-start">
+                      <div className="rounded-full bg-background p-5 text-heading-color w-fit">
+                        {study.icon}
+                      </div>
                     </div>
-                    
-                    <div className="flex justify-end">
-                      <Link href="/contact">
-                        <div className="caption inline-flex items-center text-[rgb(97,224,0)] bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg">
-                          Contact Us <ChevronRight className="ml-1 h-3 w-3" />
-                        </div>
+                    <div className="md:w-3/4">
+                      <h3 className="text-xl font-semibold mb-4 text-foreground">{study.title}</h3>
+                      <p className="text-text-secondary mb-6">{study.description}</p>
+                      
+                      <h4 className="text-lg font-medium mb-3 text-heading-color">Key Results:</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {study.results.map((result, i) => (
+                          <div key={i} className="flex items-center">
+                            <div className="w-2 h-2 rounded-full bg-primary mr-2"></div>
+                            <span className="text-foreground">{result}</span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <Link href="/contact" className="inline-flex items-center text-heading-color hover:text-primary mt-6">
+                        Discuss your project
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
                       </Link>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Industry Solutions Section */}
-      <section className="py-16 relative overflow-hidden light-bg px-4 sm:px-6">
-        <div className="container mx-auto px-4 relative z-10 max-w-[1280px]">
-          <RevealText className="text-center mb-10">
-            <h2 className="heading-2 text-[#1B3C68] mb-4">
-              Tailored IT Solutions for <span className="bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] bg-clip-text text-transparent">Every Industry</span>
-            </h2>
-          </RevealText>
-          
-          <div className="grid md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {[
-              {
-                industry: "Small & Medium Businesses",
-                focus: "SMBs",
-                description: "Cost-effective scalable IT solutions for growing businesses with limited budgets.",
-                icon: <Users className="h-5 w-5 text-white" />
-              },
-              {
-                industry: "Healthcare",
-                focus: "HIPAA Compliance",
-                description: "Secure systems with privacy controls to protect sensitive medical information.",
-                icon: <Shield className="h-5 w-5 text-white" />
-              },
-              {
-                industry: "Legal Firms",
-                focus: "Data Security", 
-                description: "Advanced encryption and secure document management for client confidentiality.",
-                icon: <LineChart className="h-5 w-5 text-white" />
-              },
-              {
-                industry: "Financial Services",
-                focus: "Risk Management",
-                description: "Real-time threat monitoring and compliance management for financial data.",
-                icon: <HardDrive className="h-5 w-5 text-white" />
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -5 }}
-                className="flex flex-col"
-              >
-                <div className={`h-full bg-white/60 backdrop-blur-sm rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-[rgb(97,224,0)]/20 p-0.5`}>
-                  <div className={`h-2 w-full ${index % 2 === 0 ? 'bg-[rgb(97,224,0)]' : 'bg-[rgb(0,218,222)]'}`}></div>
-                  <div className="p-6">
-                    <div className="flex items-center mb-4">
-                      <div className={`w-10 h-10 rounded-lg ${index % 2 === 0 ? 'bg-[rgb(97,224,0)]' : 'bg-[rgb(0,218,222)]'} flex items-center justify-center mr-3`}>
-                        {item.icon}
-                      </div>
-                      <div>
-                        <h3 className="subheading text-[#1B3C68]">{item.industry}</h3>
-                        <p className={`caption ${index % 2 === 0 ? 'text-[rgb(97,224,0)]' : 'text-[rgb(0,218,222)]'}`}>
-                          {item.focus}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="body-small mt-3">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
             ))}
           </div>
           
-          <div className="flex justify-center mt-8">
-            <Link href="/services">
-              <motion.button 
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] rounded-lg text-white shadow-md group"
-              >
-                <span className="relative flex items-center body-small text-white">
-                  View All Industry Solutions
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                </span>
-              </motion.button>
+          <div className="text-center mt-12">
+            <Link href="/contact" className="inline-block py-3 px-8 bg-primary text-foreground rounded-lg font-medium hover:bg-primary-hover transition-colors animate-on-scroll opacity-0">
+              Discuss Your Project
             </Link>
           </div>
         </div>
       </section>
-      
-      {/* About Us Highlight */}
-      <section className="py-20 relative overflow-hidden bg-[rgb(97,224,0)]/65 px-4 sm:px-6">
-        <div className="container mx-auto px-4 relative z-10 max-w-[1280px]">
-          <div className="grid md:grid-cols-5 gap-8 items-center">
-            <div className="md:col-span-2">
-              <ParallaxSection direction="right" speed={0.05}>
-                <div className="relative p-4">
-                  <motion.div
-                    className="absolute -inset-4 rounded-2xl bg-white/20 opacity-50 blur-xl"
-                    animate={{
-                      backgroundPosition: ['0% 0%', '100% 100%'],
-                    }}
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      repeatType: 'reverse',
-                      ease: 'linear',
-                    }}
-                  />
-                  <div className="relative bg-white rounded-2xl shadow-xl p-8">
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 gap-6 mb-8">
-                      {[
-                        { value: "10+", label: "Years Experience" },
-                        { value: "200+", label: "Happy Clients" },
-                        { value: "24/7", label: "Support" },
-                        { value: "99.9%", label: "Uptime" }
-                      ].map((stat, i) => (
-                        <div key={i} className="text-center">
-                          <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            whileInView={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.5, delay: i * 0.1 }}
-                            viewport={{ once: true }}
-                            className="heading-3 text-[rgb(97,224,0)] mb-1"
-                          >
-                            {stat.value}
-                          </motion.div>
-                          <div className="caption text-gray-600">{stat.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Mission snippet */}
-                    <div className="p-4 bg-[#1B3C68]/5 rounded-xl">
-                      <div className="flex items-center mb-2">
-                        <div className="w-2 h-2 rounded-full bg-[rgb(97,224,0)] mr-2"></div>
-                        <h4 className="caption font-semibold text-[#1B3C68]">Our Mission</h4>
-                      </div>
-                      <p className="body-small">
-                        To provide exceptional IT support and services that enable businesses to thrive in the digital landscape.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </ParallaxSection>
-            </div>
-            
-            <div className="md:col-span-3">
-              <RevealText>
-                <div className="tag inline-block mb-6 px-4 py-1.5 rounded-full bg-white/30 text-[#1B3C68]">
-                  About Premium Infotech
-                </div>
-              </RevealText>
-              
-              <RevealText>
-                <h2 className="heading-2 text-[#1B3C68] mb-6">
-                  Your Trusted Partner for <span className="text-white">Innovative IT Solutions</span>
-                </h2>
-              </RevealText>
-              
-              <RevealText>
-                <p className="body-large mb-6 text-[#1B3C68]">
-                  Premium Infotech is a leading provider of comprehensive IT support services designed to help businesses leverage technology for growth and efficiency. With a team of experienced professionals, we deliver tailored solutions that address the unique challenges faced by organizations of all sizes.
-                </p>
-              </RevealText>
-              
-              <RevealText>
-                <p className="body-large mb-8 text-[#1B3C68]">
-                  Founded on the principles of reliability, innovation, and customer-centricity, we've established ourselves as a trusted partner for businesses looking to optimize their IT infrastructure and operations.
-                </p>
-              </RevealText>
-              
-              <RevealText>
-                <Link href="/about">
-                  <motion.button 
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all bg-white border border-[#1B3C68] rounded-lg text-[#1B3C68] shadow-md hover:bg-[#1B3C68] hover:text-white group"
-                  >
-                    <span className="relative flex items-center">
-                      Learn More About Us
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                    </span>
-                  </motion.button>
-                </Link>
-              </RevealText>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Testimonials */}
-      <section className="py-20 relative light-bg px-4 sm:px-6">
-        <div className="container mx-auto px-4 relative z-10 max-w-[1280px]">
-          <RevealText className="text-center mb-8">
-            <div className="flex items-center justify-center mb-2">
-              <Star className="h-5 w-5 text-[rgb(97,224,0)] mr-1" fill="rgb(97,224,0)" />
-              <Star className="h-5 w-5 text-[rgb(97,224,0)] mr-1" fill="rgb(97,224,0)" />
-              <Star className="h-5 w-5 text-[rgb(97,224,0)] mr-1" fill="rgb(97,224,0)" />
-              <Star className="h-5 w-5 text-[rgb(97,224,0)] mr-1" fill="rgb(97,224,0)" />
-              <Star className="h-5 w-5 text-[rgb(97,224,0)]" fill="rgb(97,224,0)" />
-            </div>
-            <h2 className="heading-2 text-[#1B3C68] mb-4">
-              What Our Clients Say
-            </h2>
-            <p className="body-large max-w-2xl mx-auto">
-              Hear from businesses that have transformed their IT operations with our support
-            </p>
-          </RevealText>
-          
-          <ClientOnlyTestimonials testimonials={testimonials} autoplay={true} />
-        </div>
-      </section>
-      
-      {/* FAQ Section */}
-      <section className="py-20 relative overflow-hidden px-4 sm:px-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1B3C68] to-[#2a4a75]"></div>
-        <motion.div 
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "radial-gradient(circle at 30% 20%, rgba(97, 224, 0, 0.1), transparent 40%), radial-gradient(circle at 70% 60%, rgba(0, 218, 222, 0.1), transparent 40%)",
-          }}
-        />
+
+      {/* CTA Section */}
+      <section className="w-full py-24 px-4 bg-secondary relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/10 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-primary/10 blur-3xl"></div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <RevealText className="text-center mb-16">
-            <h2 className="heading-2 text-white mb-4">
-              Frequently Asked <span className="bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] bg-clip-text text-transparent">Questions</span>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="bg-background rounded-3xl p-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 animate-on-scroll opacity-0 text-heading-color">
+              Ready to transform your IT infrastructure?
             </h2>
-            <p className="body-large text-white/80 max-w-2xl mx-auto">
-              Get answers to common questions about our IT services and solutions
+            <p className="text-xl max-w-3xl mx-auto mb-10 text-text-secondary animate-on-scroll opacity-0">
+              Partner with GoFirst Tech for innovative solutions that drive business growth and efficiency.
             </p>
-          </RevealText>
-          
-          <div className="max-w-4xl mx-auto">
-            {[
-              {
-                question: "What IT services do you offer?",
-                answer: "We provide a comprehensive range of IT services including cloud computing, cybersecurity, IT infrastructure management, help desk support, software development, and strategic IT consulting. Our solutions are tailored to meet the specific needs of your business."
-              },
-              {
-                question: "How quickly can you respond to IT emergencies?",
-                answer: "We offer 24/7 emergency support with guaranteed response times based on your service level agreement. Critical issues typically receive a response within 15-30 minutes, with technicians ready to resolve your issue promptly."
-              },
-              {
-                question: "Do you work with businesses of all sizes?",
-                answer: "Yes, we work with organizations of all sizes, from small businesses to large enterprises. We tailor our services and solutions to match your specific requirements and budget constraints, ensuring you get the IT support that's right for your business."
-              },
-              {
-                question: "How do you ensure the security of our data?",
-                answer: "We implement multi-layered security approaches including advanced firewalls, intrusion detection systems, regular security audits, employee training, and data encryption. Our security protocols are regularly updated to address emerging threats and comply with industry standards."
-              },
-              {
-                question: "What is your approach to cloud migration?",
-                answer: "Our cloud migration process involves thorough assessment of your current infrastructure, designing a migration strategy that minimizes disruption, implementing the migration in planned phases, and providing ongoing support post-migration. We ensure your business operations continue smoothly throughout the transition."
-              }
-            ].map((faq, i) => (
-              <ParallaxSection direction="up" speed={0.1} key={i}>
-                <motion.div 
-                  className="mb-6 bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <motion.div
-                    className="p-6"
-                    initial={{ height: "auto" }}
-                    whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <h3 className="subheading text-white">{faq.question}</h3>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] flex items-center justify-center">
-                        <Plus className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 body text-white">
-                      {faq.answer}
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </ParallaxSection>
-            ))}
-            
-            <RevealText delay={0.6} className="text-center mt-12">
-              <Link href="/contact">
-                <motion.button 
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] rounded-lg text-white shadow-lg group"
-                >
-                  <span className="relative flex items-center">
-                    Have More Questions? Contact Us
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                  </span>
-                </motion.button>
+            <div className="flex flex-col sm:flex-row justify-center gap-4 animate-on-scroll opacity-0">
+              <Link href="/contact" className="gradient-button py-4 px-8 font-medium text-lg">
+                Schedule a Consultation
               </Link>
-            </RevealText>
+              <Link href="/services" className="py-4 px-8 border border-text-secondary/20 rounded-full font-medium text-lg hover:bg-secondary hover:text-foreground hover:border-transparent transition-colors text-text-secondary">
+                Explore Services
+              </Link>
+            </div>
           </div>
         </div>
       </section>
-      
-      {/* Client Success Stats */}
-      <section className="py-20 relative overflow-hidden light-bg px-4 sm:px-6">
-        <div className="container mx-auto px-4 relative z-10 max-w-[1280px]">
-          <RevealText className="text-center mb-16">
-            <h2 className="heading-2 text-[#1B3C68] mb-4">
-              Client Success <span className="bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] bg-clip-text text-transparent">Metrics</span>
-            </h2>
-            <p className="body-large max-w-2xl mx-auto">
-              Measurable results that showcase our impact across industries
-            </p>
-          </RevealText>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                client: "Global Financial Services",
-                title: "Cloud Migration & Security",
-                metric: "40%",
-                result: "reduction in operational costs",
-                bgColor: "from-blue-500/20 to-purple-500/20",
-                icon: <Cloud className="h-6 w-6 text-white" />
-              },
-              {
-                client: "Healthcare Provider Network",
-                title: "IT Infrastructure Upgrade",
-                metric: "99.99%",
-                result: "system uptime achieved",
-                bgColor: "from-[rgb(97,224,0)]/20 to-emerald-500/20",
-                icon: <HardDrive className="h-6 w-6 text-white" />
-              },
-              {
-                client: "E-commerce Platform",
-                title: "Cybersecurity Implementation",
-                metric: "Zero",
-                result: "security breaches in 3+ years",
-                bgColor: "from-amber-500/20 to-red-500/20",
-                icon: <Shield className="h-6 w-6 text-white" />
-              }
-            ].map((study, i) => (
-              <ParallaxSection direction="up" speed={0.1} key={i}>
-                <Animated3DCard
-                  className="h-full overflow-hidden"
-                  rotationIntensity={10}
-                  glareIntensity={0.15}
-                >
-                  <div className="p-1">
-                    <div className={`h-full bg-gradient-to-br ${study.bgColor} p-6 rounded-xl hover:shadow-lg transition-shadow duration-300`}>
-                      <div className="flex justify-between items-start mb-6">
-                        <div>
-                          <span className="caption inline-block px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm mb-2">
-                            {study.client}
-                          </span>
-                          <h3 className="subheading text-[#1B3C68] mb-1">{study.title}</h3>
-                        </div>
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[rgb(97,224,0)] to-[rgb(0,218,222)] flex items-center justify-center">
-                          {study.icon}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="heading-3 text-[#1B3C68]">{study.metric}</div>
-                        <div className="body">{study.result}</div>
-                      </div>
-                    </div>
-                  </div>
-                </Animated3DCard>
-              </ParallaxSection>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      <style jsx global>{`
-        .bg-circuit-pattern {
-          background-image: url('/images/circuit-pattern.svg');
-          background-repeat: repeat;
-          background-size: 400px;
-        }
-        
-        .bg-world-map {
-          background-image: url('/images/world-map.svg');
-          background-repeat: no-repeat;
-          background-size: contain;
-          opacity: 0.3;
-        }
-        
-        .gradient-text {
-          background: linear-gradient(to right, rgb(97, 224, 0), rgb(0, 218, 222));
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        
-        .gradient-bg {
-          background: linear-gradient(to right, rgb(97, 224, 0), rgb(0, 218, 222));
-        }
-      `}</style>
-    </div>
+    </main>
   );
 }

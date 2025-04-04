@@ -1,20 +1,23 @@
-"use client";
+import './globals.css'
+import { Inter as GeistSans } from 'next/font/google'
+import { Roboto_Mono as GeistMono } from 'next/font/google'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/ui/navbar";
-import Footer from "@/components/ui/footer";
-import { CTASection } from "@/components/ui/cta-section";
+const geistSans = GeistSans({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+})
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const geistMono = GeistMono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const metadata = {
+  title: 'GoFirst Tech - IT Solutions for Modern Business',
+  description: 'We provide IT consultancy and tech support services tailored for your business needs.',
+}
 
 export default function RootLayout({
   children,
@@ -22,23 +25,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col relative`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
-        {/* Background decorative elements */}
-        <div className="fixed top-20 left-0 w-64 h-64 rounded-full bg-[rgb(97,224,0)]/5 -translate-x-1/2 z-0"></div>
-        <div className="fixed top-1/3 right-0 w-96 h-96 rounded-full bg-[rgb(0,218,222)]/5 translate-x-1/3 z-0"></div>
-        <div className="fixed bottom-40 left-1/4 w-72 h-72 rounded-full bg-[rgb(97,224,0)]/5 -translate-x-1/2 z-0"></div>
-        
-        {/* Subtle grid pattern */}
-        <div className="fixed inset-0 bg-grid-pattern opacity-[0.05] z-0"></div>
-        
         <Navbar />
-        <div className="flex-grow relative z-10">
+        <div className="pt-16 min-h-screen">
           {children}
         </div>
-        <CTASection />
         <Footer />
       </body>
     </html>

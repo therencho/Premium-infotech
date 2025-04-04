@@ -1,490 +1,239 @@
 "use client";
 
-import { UserRound, Target, Eye, Headphones, Cloud, Shield, HardDrive, Smartphone, BarChart3, MessageSquareQuote } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
-import { ParallaxSection } from "@/components/ui/parallax-section";
-import { Animated3DCard } from "@/components/ui/animated-3d-card";
-import { RevealText } from "@/components/ui/reveal-text";
-import { PageHeader } from "@/components/ui/page-header";
-import { ReactNode } from "react";
+import { useEffect, useRef } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import AnimatedCard from '@/components/AnimatedCard';
+import PageHero from '@/components/PageHero';
 
-// Animated border component with gradient effect for section containers
-const AnimatedBorder = ({ children, className = "" }: { children: ReactNode; className?: string }) => {
-  return (
-    <div className={`relative rounded-2xl ${className}`}>
-      {/* Gradient border with blur effect */}
-      <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-[rgb(97,224,0)]/40 to-[rgb(0,218,222)]/40 opacity-70 blur-[2px] group-hover:opacity-100 transition-opacity"></div>
-      <motion.div 
-        className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-[rgb(97,224,0)]/30 to-[rgb(0,218,222)]/30"
-        animate={{
-          backgroundPosition: ['0% 0%', '100% 100%'],
-          rotate: [0, 0.5, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          repeatType: 'reverse',
-          ease: 'linear',
-        }}
-      />
-      <div className="relative bg-white rounded-2xl h-full z-10">
-        {children}
-      </div>
-    </div>
-  );
-};
+export default function AboutPage() {
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-// Thinner border variant for stats and smaller components
-const ThinBorder = ({ children, className = "" }: { children: ReactNode; className?: string }) => {
-  return (
-    <div className={`relative rounded-xl ${className}`}>
-      <div className="absolute -inset-[0.5px] rounded-xl bg-gradient-to-r from-[rgb(97,224,0)]/30 to-[rgb(0,218,222)]/30 opacity-60 blur-[1px] group-hover:opacity-100 transition-opacity"></div>
-      <motion.div 
-        className="absolute -inset-[0.5px] rounded-xl bg-gradient-to-r from-[rgb(97,224,0)]/20 to-[rgb(0,218,222)]/20"
-        animate={{
-          backgroundPosition: ['0% 0%', '100% 100%'],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          repeatType: 'reverse',
-          ease: 'linear',
-        }}
-      />
-      <div className="relative bg-white rounded-xl h-full z-10">
-        {children}
-      </div>
-    </div>
-  );
-};
-
-// Helper function for deterministic animation values based on index
-const getParticleProps = (index: number) => {
-  const sizes = [15, 25, 35, 20, 30, 40, 18, 28, 22, 32];
-  const positions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 95];
-  const durations = [12, 15, 18, 20, 14, 16, 13, 17, 19, 21];
-  const delays = [0, 1, 2, 3, 4, 2.5, 3.5, 1.5, 2.2, 3.2];
-  const xOffsets = [5, -5, 8, -8, 10, -10, 7, -7, 3, -3];
-  
-  const sizeIndex = index % sizes.length;
-  const posIndex = index % positions.length;
-  const durIndex = index % durations.length;
-  const delayIndex = index % delays.length;
-  const xOffsetIndex = index % xOffsets.length;
-  
-  return {
-    width: sizes[sizeIndex],
-    height: sizes[sizeIndex],
-    left: `${positions[posIndex]}%`,
-    top: `${positions[(posIndex + 3) % positions.length]}%`,
-    duration: durations[durIndex],
-    delay: delays[delayIndex],
-    xOffset: xOffsets[xOffsetIndex]
-  };
-};
-
-const AboutPage = () => {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll();
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Track mouse position for hover effects - only on client side
   useEffect(() => {
-    setIsMounted(true);
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: e.clientX,
-        y: e.clientY
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in');
+          observerRef.current?.unobserve(entry.target);
+        }
       });
-    };
+    }, { threshold: 0.1 });
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach(el => {
+      observerRef.current?.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
   }, []);
 
-  // Apple-like scroll-driven animations
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0.2]);
-  const headerScale = useTransform(scrollYProgress, [0, 0.1], [1, 0.95]);
+  const team = [
+    {
+      name: 'Alex Morgan',
+      role: 'CEO & Founder',
+      bio: 'Over 15 years of experience in IT leadership and strategic planning.',
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      name: 'Jamie Chen',
+      role: 'CTO',
+      bio: 'Expert in cloud architecture and cybersecurity implementation.',
+      image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      name: 'Taylor Williams',
+      role: 'Head of Support',
+      bio: 'Leads our world-class technical support team with a focus on client satisfaction.',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      name: 'Sam Rivera',
+      role: 'Senior Consultant',
+      bio: 'Specializes in digital transformation and enterprise IT strategy.',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+    }
+  ];
+
+  const values = [
+    {
+      title: 'Client-Focused Solutions',
+      description: 'We prioritize understanding your unique business needs to deliver tailored IT solutions that drive real results.',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      )
+    },
+    {
+      title: 'Technical Excellence',
+      description: 'Our team maintains the highest standards of technical expertise, continuously learning to stay ahead of industry trends.',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      )
+    },
+    {
+      title: 'Integrity & Transparency',
+      description: 'We believe in honest communication and transparent business practices in all our client relationships.',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      )
+    },
+    {
+      title: 'Proactive Support',
+      description: 'We anticipate potential issues and address them before they impact your business operations.',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      )
+    }
+  ];
+
+  const aboutIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+  );
 
   return (
-    <div ref={containerRef} className="relative overflow-x-hidden">
-      {/* Page Header with Breadcrumb */}
-      <PageHeader 
-        title="About Premium Infotech" 
-        subtitle="Your trusted partner for innovative IT solutions that power business growth and transformation."
-        pageName="About"
+    <main className="flex flex-col items-center">
+      {/* Use the PageHero component */}
+      <PageHero 
+        title="About Us"
+        description="Helping businesses leverage technology for growth and innovation since 2010."
+        icon={aboutIcon}
       />
 
-      {/* Who We Are Section */}
-      <section className="relative flex items-center overflow-hidden px-4 sm:px-6 pt-8 pb-4">
-        <div className="container mx-auto px-4 py-12 mb-6 rounded-[2rem] relative overflow-hidden max-w-[1280px]">
-          <div className="absolute inset-0 bg-gradient-to-r from-[rgb(97,224,0)]/10 to-[rgb(0,218,222)]/10"></div>
-          {isMounted && (
-            <motion.div 
-              className="absolute inset-0"
-              style={{
-                background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(97, 224, 0, 0.15), transparent 60%)`,
-              }}
-            />
-          )}
-          
-          <div className="flex flex-col md:flex-row gap-12 items-center relative z-10">
-            <div className="md:w-1/2 overflow-hidden">
-              <ParallaxSection direction="left" speed={0.05}>
-                <div className="pl-4">
-                  <RevealText direction="left">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6 flex items-center">
-                      <span className="mr-3 text-[#65D80D]">
-                        <motion.div
-                          animate={{ rotate: [0, 10, 0] }}
-                          transition={{ 
-                            duration: 5, 
-                            repeat: Infinity, 
-                            ease: "easeInOut" 
-                          }}
-                        >
-                          <UserRound size={32} />
-                        </motion.div>
-                      </span>
-                      Who We Are
-                    </h2>
-                    <p className="text-gray-600 mb-4 text-lg leading-relaxed">
-                      Premium Infotech is a leading provider of comprehensive IT support services designed to help businesses leverage technology for growth and efficiency. With a team of experienced professionals, we deliver tailored solutions that address the unique challenges faced by organizations of all sizes.
-                    </p>
-                    <p className="text-gray-600 text-lg leading-relaxed">
-                      Founded on the principles of reliability, innovation, and customer-centricity, we've established ourselves as a trusted partner for businesses looking to optimize their IT infrastructure and operations.
-                    </p>
-                  </RevealText>
-                </div>
-              </ParallaxSection>
+      {/* Our Story */}
+      <section className="w-full py-20 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 items-center">
+          <div className="lg:w-1/2 animate-on-scroll opacity-0">
+            <h2 className="text-3xl font-bold mb-6 text-custom-heading">Our Story</h2>
+            <div className="space-y-4 text-custom">
+              <p>
+                GoFirst Tech was founded with a simple mission: to provide businesses with enterprise-level IT solutions that were previously only accessible to large corporations. We believe that every business deserves reliable technology that enables growth.
+              </p>
+              <p>
+                Starting as a small team of IT consultants in 2010, we've grown into a comprehensive technology partner for businesses across multiple industries. Our approach has always been to focus on understanding our clients' unique needs and delivering tailored solutions that directly impact their success.
+              </p>
+              <p>
+                Today, our team of certified experts continues to uphold our founding principles while expanding our service offerings to meet evolving technology needs in an increasingly digital business environment.
+              </p>
             </div>
-            
-            <div className="w-full md:w-1/2 mt-8 md:mt-0">
-              <ParallaxSection direction="right" speed={0.1}>
-                {/* Simplified IT Help Desk & Support System Illustration */}
-                <motion.div 
-                  className="relative h-80 md:h-[400px] w-full rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-[#111827]/90 to-[#2D3748]/90"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {/* Static Background Grid Pattern */}
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="absolute inset-0 bg-grid-pattern"></div>
-                  </div>
-                  
-                  {/* Central Help Desk Station - Simplified */}
-                  <div 
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full bg-black/40 backdrop-blur-md border-2 border-[rgb(0,218,222)] flex items-center justify-center z-10"
-                  >
-                    <motion.div
-                      animate={{ rotate: [0, 360] }}
-                      transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-3 rounded-full border border-dashed border-[rgb(97,224,0)]/30"
-                    />
-                    <Headphones size={36} className="text-[rgb(97,224,0)]" />
-                  </div>
-                  
-                  {/* Static Computer Workstations */}
-                  {Array.from({ length: 4 }).map((_, index) => {
-                    const angle = (index / 4) * Math.PI * 2;
-                    const distance = 110;
-                    const x = Math.cos(angle) * distance;
-                    const y = Math.sin(angle) * distance;
-                    
-                    return (
-                      <div
-                        key={`workstation-${index}`}
-                        className="absolute w-20 h-16 flex flex-col items-center"
-                        style={{
-                          top: "50%",
-                          left: "50%",
-                          transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`,
-                        }}
-                      >
-                        {/* Monitor */}
-                        <div 
-                          className="w-14 h-10 bg-black/60 border border-[rgb(97,224,0)]/70 rounded-md flex items-center justify-center mb-1"
-                        >
-                          <div className="w-12 h-8 rounded bg-[rgb(97,224,0)]/10" />
-                        </div>
-                        
-                        {/* Stand */}
-                        <div className="w-1 h-2 bg-gray-500"></div>
-                        
-                        {/* Base */}
-                        <div className="w-8 h-1 bg-gray-600 rounded-full"></div>
-                      </div>
-                    );
-                  })}
-                  
-                  {/* Static Connection Lines */}
-                  {Array.from({ length: 4 }).map((_, index) => {
-                    const angle = (index / 4) * Math.PI * 2;
-                    const length = 110;
-                    
-                    return (
-                      <div
-                        key={`connection-${index}`}
-                        className="absolute top-1/2 left-1/2 h-[1px] origin-left z-0"
-                        style={{
-                          width: length,
-                          backgroundColor: "rgba(0, 218, 222, 0.4)",
-                          transform: `translate(-50%, -50%) rotate(${angle}rad)`,
-                        }}
-                      />
-                    );
-                  })}
-                  
-                  {/* Simplified Data Pulses - reduced to just 2 */}
-                  {Array.from({ length: 2 }).map((_, index) => {
-                    const angle = (index / 2) * Math.PI;
-                    
-                    return (
-                      <motion.div
-                        key={`pulse-${index}`}
-                        className="absolute top-1/2 left-1/2 h-1 w-1 rounded-full bg-[rgb(97,224,0)] z-10"
-                        animate={{
-                          x: [0, Math.cos(angle) * 110],
-                          y: [0, Math.sin(angle) * 110],
-                          opacity: [1, 0],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          delay: index * 2,
-                          ease: "linear",
-                        }}
-                      />
-                    );
-                  })}
-                  
-                  {/* Company Name Overlay - Simplified */}
-                  <div
-                    className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center bg-black/50 backdrop-blur-md px-4 py-2 rounded-lg border border-[rgb(0,218,222)]"
-                  >
-                    <h3 className="text-lg font-bold text-[rgb(97,224,0)]">
-                      Premium Infotech
-                    </h3>
-                    <p className="text-xs text-white">IT Help Desk & Support</p>
-                  </div>
-                </motion.div>
-              </ParallaxSection>
-            </div>
+          </div>
+          <div className="lg:w-1/2 animate-on-scroll opacity-0">
+            <AnimatedCard>
+              <div className="relative h-[400px] w-full rounded-xl overflow-hidden">
+                <Image
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                  alt="Our team collaboration"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
+            </AnimatedCard>
           </div>
         </div>
       </section>
 
-      {/* Mission & Vision Section - made equal height */}
-      <section className="py-8 relative overflow-hidden px-4 sm:px-6">
-        <div className="container mx-auto px-4 py-6 mb-6 max-w-[1280px]">
-          <div className="grid md:grid-cols-2 gap-10">
-            <ParallaxSection direction="up" speed={0.15} className="pt-4 pb-4">
-              <AnimatedBorder className="h-full shadow-sm border-2 border-[rgb(97,224,0)]/20">
-                <div className="p-8 h-full flex flex-col">
-                  <div className="flex items-center mb-4">
-                    <motion.div
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.7 }}
-                      className="p-3 gradient-bg rounded-full mr-4 flex-shrink-0"
-                    >
-                      <Target className="h-6 w-6 text-white" />
-                    </motion.div>
-                    <RevealText>
-                      <h2 className="text-2xl md:text-3xl font-bold">Our Mission</h2>
-                    </RevealText>
-                  </div>
-                  <RevealText delay={0.2} className="flex-grow">
-                    <p className="text-gray-700 leading-relaxed">
-                      To provide exceptional IT support and services that enable businesses to thrive in the digital landscape. We aim to simplify technology for our clients, allowing them to focus on their core operations while we handle their IT needs with expertise and dedication.
-                    </p>
-                  </RevealText>
-                </div>
-              </AnimatedBorder>
-            </ParallaxSection>
-            
-            <ParallaxSection direction="up" speed={0.15} className="pt-4 pb-4">
-              <AnimatedBorder className="h-full shadow-sm border-2 border-[rgb(97,224,0)]/20">
-                <div className="p-8 h-full flex flex-col">
-                  <div className="flex items-center mb-4">
-                    <motion.div
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.7 }}
-                      className="p-3 gradient-bg rounded-full mr-4 flex-shrink-0"
-                    >
-                      <Eye className="h-6 w-6 text-white" />
-                    </motion.div>
-                    <RevealText>
-                      <h2 className="text-2xl md:text-3xl font-bold">Our Vision</h2>
-                    </RevealText>
-                  </div>
-                  <RevealText delay={0.2} className="flex-grow">
-                    <p className="text-gray-700 leading-relaxed">
-                      To be the leading provider of innovative IT support services globally, recognized for our excellence, reliability, and commitment to driving business success through technology. We envision a world where businesses can harness the full potential of IT without the complexity and challenges.
-                    </p>
-                  </RevealText>
-                </div>
-              </AnimatedBorder>
-            </ParallaxSection>
-          </div>
-        </div>
-      </section>
-
-      {/* Founder's Message - with dark background */}
-      <section className="py-12 relative overflow-hidden px-4 sm:px-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1B3C68] to-[#2a4a75]"></div>
-        <motion.div 
-          className="absolute inset-0"
-          style={{
-            backgroundImage: "radial-gradient(circle at 30% 20%, rgba(97, 224, 0, 0.2), transparent 40%), radial-gradient(circle at 70% 60%, rgba(0, 218, 222, 0.2), transparent 40%)",
-          }}
-        />
-        {/* Circuit lines */}
-        <div className="absolute inset-0 opacity-10 overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-circuit-pattern"></div>
-        </div>
-        
-        <div className="container mx-auto px-4 py-8 mb-6 max-w-[1280px] relative z-10">
-          <RevealText className="text-center mb-12">
-            <h2 className="text-3xl md:text-5xl font-bold text-white inline-block">
-              Founder's <span className="bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] bg-clip-text text-transparent">Message</span>
-            </h2>
-          </RevealText>
-          
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 border border-white/20">
-            <div className="relative">
-              <MessageSquareQuote className="absolute -top-2 -left-2 h-10 w-10 text-[rgb(97,224,0)]/40" />
-              <p className="text-white/90 text-lg leading-relaxed pl-6 md:pl-0">
-                "Our journey began with a simple vision: to make technology work for businesses, not the other way around. At Premium Infotech, we believe that IT should be an enabler, not a barrier. For over a decade, we've been committed to delivering exceptional support and innovative solutions that help our clients navigate the digital landscape with confidence. As we continue to grow, our focus remains unwavering: to simplify technology and empower businesses to achieve their full potential."
-              </p>
-              <p className="text-white/90 text-lg leading-relaxed mt-4 pl-6 md:pl-0">
-                "I'm incredibly proud of our team of dedicated professionals who share this passion for excellence and customer satisfaction. Together, we're building a future where technology serves as a catalyst for business success, and we're excited to partner with you on this journey."
-              </p>
-              <div className="flex justify-end mt-4">
-                <div className="inline-flex items-center">
-                  <div className="h-1 w-8 bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] mr-2"></div>
-                  <p className="text-[rgb(97,224,0)] font-medium">CEO & Founder</p>
+      {/* Our Values Section - Update to use card-custom for better theme contrast */}
+      <section className="w-full py-20 px-4 bg-secondary">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-16 text-center animate-on-scroll opacity-0 text-heading-color">Our Values</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {values.map((value, index) => (
+              <div key={index} className="card-custom p-8 rounded-xl h-full animate-on-scroll opacity-0 transition-all duration-300 hover:shadow-lg">
+                <div className="flex flex-col h-full">
+                  <div className="mb-4 text-heading-color">{value.icon}</div>
+                  <h3 className="text-xl font-semibold mb-2 text-heading-color">{value.title}</h3>
+                  <p className="text-foreground">{value.description}</p>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="py-8 relative overflow-hidden px-4 sm:px-6">
-        <div id="services" className="container mx-auto px-4 py-8 mb-6 max-w-[1280px]">
-          <RevealText className="text-center mb-12">
-            <h2 className="text-3xl md:text-5xl font-bold gradient-text inline-block">
-              Our Services
-            </h2>
-          </RevealText>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Headphones className="h-10 w-10" />,
-                title: "Help Desk Support",
-                description: "On-demand IT help for employees via chat, email, or call with tiered support for different complexity levels."
-              },
-              {
-                icon: <Cloud className="h-10 w-10" />,
-                title: "Cloud Services Support",
-                description: "Managing cloud platforms including Microsoft 365, Google Workspace, AWS, and Azure with backup and migration assistance."
-              },
-              {
-                icon: <Shield className="h-10 w-10" />,
-                title: "Cybersecurity Monitoring",
-                description: "Comprehensive threat detection, firewall setup, security audits, and employee training for security awareness."
-              },
-              {
-                icon: <HardDrive className="h-10 w-10" />,
-                title: "Data Backup & Recovery",
-                description: "Setting up automated backup systems and efficient restoration of lost or corrupted data when needed."
-              },
-              {
-                icon: <Smartphone className="h-10 w-10" />,
-                title: "Device Management",
-                description: "Remote management of all business devices with enforced security policies and timely updates."
-              },
-              {
-                icon: <BarChart3 className="h-10 w-10" />,
-                title: "IT Consulting & Planning",
-                description: "Strategic advice on tech upgrades, migrations, infrastructure setup, and regulatory compliance."
-              }
-            ].map((service, index) => (
-              <Animated3DCard 
-                key={index} 
-                className="backdrop-blur-md bg-white/60 h-full" 
-                borderRadius={20}
-                rotationIntensity={10}
-              >
-                <AnimatedBorder className="h-full">
-                  <div className="p-6 h-full flex flex-col">
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-[#65D80D] mb-4"
-                    >
-                      {service.icon}
-                    </motion.div>
-                    <RevealText delay={index * 0.05} className="flex-grow">
-                      <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-                      <p className="text-gray-600">{service.description}</p>
-                    </RevealText>
-                  </div>
-                </AnimatedBorder>
-              </Animated3DCard>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Stats Section - MOVED to after services with thinner borders */}
-      <ParallaxSection className="container mx-auto px-4 py-4 mb-6 max-w-[1280px]">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { number: "10+", label: "Years Experience" },
-            { number: "200+", label: "Happy Clients" },
-            { number: "24/7", label: "Support" },
-            { number: "99.9%", label: "Uptime" },
-          ].map((stat, index) => (
-            <Animated3DCard 
-              key={index} 
-              className="backdrop-blur-sm bg-[rgb(97,224,0)]/10 rounded-xl" 
-              borderRadius={16}
-              rotationIntensity={5}
-            >
-              <div className="py-3 px-2 text-center">
-                <RevealText delay={index * 0.1} direction="up">
-                  <motion.p
-                    initial={{ scale: 0.8 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 300, 
-                      damping: 20, 
-                      delay: index * 0.1 
-                    }}
-                    className="text-3xl md:text-4xl font-bold text-[#65D80D] mb-1"
-                  >
-                    {stat.number}
-                  </motion.p>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
-                </RevealText>
-              </div>
-            </Animated3DCard>
-          ))}
+      {/* Our Team */}
+      <section className="w-full py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-16 text-center animate-on-scroll opacity-0 text-custom-heading">Our Leadership Team</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {team.map((member, index) => (
+              <AnimatedCard key={index} className="card-custom animate-on-scroll opacity-0">
+                <div className="relative h-[300px] mb-4 rounded-xl overflow-hidden">
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold parallax-content text-custom-heading">{member.name}</h3>
+                  <p className="text-primary mb-2 parallax-content">{member.role}</p>
+                  <p className="text-custom text-sm parallax-content">{member.bio}</p>
+                </div>
+              </AnimatedCard>
+            ))}
+          </div>
         </div>
-      </ParallaxSection>
-    </div>
-  );
-};
+      </section>
 
-export default AboutPage;
+      {/* Why Choose Us */}
+      <section className="w-full py-20 px-4 bg-primary">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-12 text-center animate-on-scroll opacity-0 text-custom">Why Choose GoFirst Tech</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center animate-on-scroll opacity-0">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-custom/20 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-custom" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-custom">Proven Expertise</h3>
+              <p className="text-custom/90">Our team of certified professionals brings decades of combined experience across all IT domains.</p>
+            </div>
+            <div className="text-center animate-on-scroll opacity-0">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-custom/20 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-custom" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-custom">24/7 Support</h3>
+              <p className="text-custom/90">We're always available to ensure your critical systems remain operational at all times.</p>
+            </div>
+            <div className="text-center animate-on-scroll opacity-0">
+              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-custom/20 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-custom" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-custom">Results-Driven</h3>
+              <p className="text-custom/90">Our solutions are designed to deliver measurable business improvements and ROI.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="w-full py-24 px-4">
+        <div className="max-w-4xl mx-auto text-center animate-on-scroll opacity-0">
+          <h2 className="text-3xl font-bold mb-6 text-custom-heading">
+            Ready to partner with us?
+          </h2>
+          <p className="text-lg text-custom mb-8">
+            Contact our team today to discuss how we can help your business leverage technology for success.
+          </p>
+          <Link href="/contact" className="gradient-button py-3 px-6 font-medium inline-block">
+            Get in Touch
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
+} 

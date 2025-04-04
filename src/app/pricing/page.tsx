@@ -1,245 +1,578 @@
 "use client";
 
-import { PageHeader } from "@/components/ui/page-header";
-import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
-import { Check, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
-import Link from "next/link";
+import { useEffect, useRef, useState } from 'react';
+import AnimatedCard from '@/components/AnimatedCard';
+import PageHero from '@/components/PageHero';
 
 export default function PricingPage() {
-  const testimonials = [
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const [annualBilling, setAnnualBilling] = useState(true);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    plan: '',
+    message: '',
+  });
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in');
+          observerRef.current?.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach(el => {
+      observerRef.current?.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submitted:', formData);
+    setFormSubmitted(true);
+  };
+
+  const openContactModal = (planName: string) => {
+    setSelectedPlan(planName);
+    setFormData(prev => ({ ...prev, plan: planName }));
+    setShowContactModal(true);
+    setFormSubmitted(false);
+  };
+
+  const consultingPlans = [
     {
-      quote: "Premium Infotech revolutionized our IT infrastructure with their cloud migration services. The efficiency gains and cost savings have been remarkable, allowing us to focus on our core business operations.",
-      name: "Sarah Johnson",
-      designation: "CTO, Global Innovations"
+      name: 'Assessment',
+      description: 'Comprehensive evaluation of your current IT infrastructure and recommendations.',
+      price: annualBilling ? '2,999' : '3,499',
+      features: [
+        'IT Infrastructure Assessment',
+        'Security Vulnerability Scan',
+        'Detailed Recommendations Report',
+        'One-time Executive Presentation',
+        '30-day Action Plan'
+      ],
+      highlighted: false,
+      cta: 'Get Started'
     },
     {
-      quote: "Their cybersecurity solution detected and prevented what could have been a devastating breach. The team's expertise and quick response made all the difference. I highly recommend their managed security services.",
-      name: "Michael Chen",
-      designation: "IT Director, FinTech Solutions"
+      name: 'Strategic',
+      description: 'Ongoing IT consulting and strategic planning for business growth.',
+      price: annualBilling ? '4,499' : '4,999',
+      features: [
+        'Quarterly IT Strategy Sessions',
+        'Technology Roadmap Development',
+        'Vendor Management',
+        'Monthly Executive Reporting',
+        'Dedicated Consultant',
+        'Priority Support Channel'
+      ],
+      highlighted: true,
+      cta: 'Choose Plan'
     },
     {
-      quote: "We've been using Premium Infotech's managed IT services for over two years, and the level of support has been exceptional. Their team is responsive, knowledgeable, and always goes above and beyond.",
-      name: "Amanda Rodriguez",
-      designation: "Operations Manager, Healthcare Systems"
+      name: 'Enterprise',
+      description: 'Comprehensive IT management and strategic partnership.',
+      price: annualBilling ? 'Custom' : 'Custom',
+      features: [
+        'Monthly On-site Strategic Sessions',
+        'Complete IT Strategy & Implementation',
+        'Digital Transformation Planning',
+        'CIO-as-a-Service',
+        'Custom SLA',
+        '24/7 Priority Support',
+        'Technology Budget Planning'
+      ],
+      highlighted: false,
+      cta: 'Contact Us'
     }
   ];
 
-  const pricingPlans = [
+  const supportPlans = [
     {
-      name: "Starter",
-      price: "$499",
-      period: "per month",
-      description: "Essential IT support for small businesses just getting started.",
-      isPopular: false,
+      name: 'Basic',
+      description: 'Essential support for small businesses.',
+      price: annualBilling ? '299' : '349',
+      perText: '/month',
       features: [
-        "8/5 Help Desk Support",
-        "Basic Network Monitoring",
-        "Email Security",
-        "Quarterly IT Health Reports",
-        "5 User Accounts"
-      ]
+        'Remote Support (9am-5pm)',
+        'Email & Chat Support',
+        'Up to 10 Devices',
+        '4-Hour Response Time',
+        'Monthly System Health Checks'
+      ],
+      highlighted: false,
+      cta: 'Get Started'
     },
     {
-      name: "Professional",
-      price: "$999",
-      period: "per month",
-      description: "Comprehensive managed IT services for growing businesses.",
-      isPopular: true,
+      name: 'Professional',
+      description: 'Comprehensive support for growing businesses.',
+      price: annualBilling ? '699' : '799',
+      perText: '/month',
       features: [
-        "24/7 Priority Support",
-        "Advanced Network Monitoring",
-        "Cloud Backup Solutions",
-        "Cyber Security Protection",
-        "Monthly IT Health Reports",
-        "Employee Security Training",
-        "15 User Accounts"
-      ]
+        '24/7 Remote Support',
+        'Phone, Email & Chat Support',
+        'Up to 25 Devices',
+        '1-Hour Response Time',
+        'Weekly System Health Checks',
+        'Network Monitoring',
+        'Quarterly Security Updates'
+      ],
+      highlighted: true,
+      cta: 'Choose Plan'
     },
     {
-      name: "Business",
-      price: "$1,999",
-      period: "per month",
-      description: "Enhanced protection and support for established organizations.",
-      isPopular: false,
+      name: 'Premium',
+      description: 'Complete IT support solution for established businesses.',
+      price: annualBilling ? '1,299' : '1,499',
+      perText: '/month',
       features: [
-        "24/7 Premium Support",
-        "Complete Infrastructure Monitoring",
-        "Enhanced Security Suite",
-        "Disaster Recovery Planning",
-        "Dedicated Technical Account Manager",
-        "Quarterly Strategy Reviews",
-        "50 User Accounts"
-      ]
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "tailored solution",
-      description: "Tailored IT solutions for large-scale enterprise requirements.",
-      isPopular: false,
-      features: [
-        "White Glove 24/7 Support",
-        "Full-Spectrum IT Management",
-        "Advanced Threat Protection",
-        "Custom Security Protocols",
-        "Multi-Site Support",
-        "IT Roadmap Development",
-        "Unlimited User Accounts"
-      ]
+        '24/7 Remote & On-site Support',
+        'Dedicated Support Team',
+        'Unlimited Devices',
+        '30-Minute Response Time',
+        'Daily System Health Checks',
+        'Advanced Security Monitoring',
+        'Monthly Strategy Sessions',
+        'Employee Training Sessions'
+      ],
+      highlighted: false,
+      cta: 'Choose Plan'
     }
   ];
+
+  const faqs = [
+    {
+      question: "What industries do you specialize in?",
+      answer: "We provide IT services across multiple industries including healthcare, finance, retail, manufacturing, and professional services. Our team has specialized experience in regulatory compliance for highly regulated sectors."
+    },
+    {
+      question: "Do you offer remote support options?",
+      answer: "Yes, our technical support team provides 24/7 remote assistance for all clients. We can resolve most issues without requiring an on-site visit, reducing downtime and costs."
+    },
+    {
+      question: "How do you handle data security and privacy?",
+      answer: "We implement multi-layered security protocols including encryption, access controls, regular security audits, and employee training. All our practices comply with industry standards and regulations like GDPR, HIPAA, and others as applicable."
+    },
+    {
+      question: "What is your typical response time for support requests?",
+      answer: "Critical issues are addressed within 15-30 minutes. Standard support requests are typically handled within 1-2 hours during business hours. We prioritize based on severity and impact on your operations."
+    },
+    {
+      question: "Do you offer flexible service plans?",
+      answer: "Yes, we provide customizable service plans from basic monitoring to comprehensive managed IT services. We'll work with you to create a solution that fits your specific needs and budget constraints."
+    },
+    {
+      question: 'Can I switch between plans later?',
+      answer: 'Yes, you can upgrade or downgrade your plan at any time. Changes will be prorated for the remainder of your billing cycle.'
+    },
+    {
+      question: 'Do you provide support for both Mac and PC?',
+      answer: 'Yes, our support covers all major operating systems including Windows, macOS, and Linux environments.'
+    },
+    {
+      question: 'How quickly can you start providing services?',
+      answer: 'For most support plans, we can begin service within 24-48 hours. Strategic consulting services typically start with an initial assessment phase lasting 1-2 weeks.'
+    }
+  ];
+
+  const pricingIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
 
   return (
-    <>
-      <PageHeader 
-        title="Our Pricing" 
-        subtitle="Transparent and flexible pricing plans for all your IT needs"
-        pageName="Pricing"
+    <main className="flex flex-col items-center">
+      {/* Hero Section */}
+      <PageHero
+        title="Simple, Transparent Pricing"
+        description="Choose the plan that fits your business needs with no hidden fees or surprises."
+        icon={pricingIcon}
       />
-      
-      <main className="container mx-auto py-10 px-4">
-        <section className="mb-20">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-[#1B3C68]">Choose Your IT Support Plan</h2>
-            <p className="text-[#1B3C68]/70">
-              Select from our range of comprehensive IT service packages designed to meet your business needs
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {pricingPlans.map((plan, index) => (
-              <motion.div 
-                key={plan.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+
+      {/* Billing Toggle */}
+      <section className="w-full py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-center items-center space-x-4 animate-on-scroll opacity-0">
+            <button
+              onClick={() => setAnnualBilling(false)}
+              className={`text-lg transition-colors ${!annualBilling ? 'font-semibold text-foreground' : 'text-text-secondary'}`}
+            >
+              Monthly
+            </button>
+            <button 
+              onClick={() => setAnnualBilling(!annualBilling)} 
+              className="relative inline-flex h-8 w-16 items-center rounded-full cursor-pointer"
+              aria-pressed={annualBilling}
+            >
+              <span className="sr-only">Toggle annual billing</span>
+              <span 
                 className={`
-                  relative rounded-2xl p-6 shadow-lg border-2 overflow-hidden
-                  ${plan.isPopular 
-                    ? 'border-[rgb(97,224,0)] ring-4 ring-[rgb(97,224,0)]/20' 
-                    : 'border-gray-200 hover:border-[rgb(97,224,0)]/50 transition-colors'}
+                  absolute h-6 w-6 transform rounded-full transition-transform 
+                  ${annualBilling ? 'translate-x-9 bg-primary' : 'translate-x-1 bg-secondary'}
+                `}
+              />
+              <span 
+                className={`
+                  inline-block h-8 w-16 rounded-full 
+                  ${annualBilling ? 'bg-primary/20' : 'bg-secondary/30'}
+                `}
+              />
+            </button>
+            <button
+              onClick={() => setAnnualBilling(true)}
+              className={`text-lg transition-colors ${annualBilling ? 'font-semibold text-foreground' : 'text-text-secondary'}`}
+            >
+              Annual <span className="text-sm text-primary font-normal">Save 15%</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* IT Support Plans */}
+      <section className="w-full py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-16 text-center animate-on-scroll opacity-0 text-heading-color">
+            IT Support Plans
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {supportPlans.map((plan, index) => (
+              <AnimatedCard 
+                key={index} 
+                className={`
+                  h-full relative p-8 rounded-2xl
+                  ${plan.highlighted ? 
+                    'bg-primary border-2 border-primary' : 
+                    'bg-background border border-primary/20'}
                 `}
               >
-                {plan.isPopular && (
-                  <div className="absolute top-0 right-0">
-                    <div className="bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] text-white text-xs font-bold px-4 py-1 rounded-bl-lg shadow-md">
-                      MOST POPULAR
-                    </div>
-                  </div>
-                )}
-                
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-[#1B3C68] mb-2">{plan.name}</h3>
-                  <div className="flex items-end">
-                    <span className={`text-3xl font-bold ${plan.isPopular ? 'text-[rgb(97,224,0)]' : 'text-[#1B3C68]'}`}>
-                      {plan.price}
+                {plan.highlighted && (
+                  <div className="absolute -top-4 left-0 right-0 text-center">
+                    <span className="bg-secondary text-foreground text-sm font-medium px-4 py-1 rounded-full shadow-lg">
+                      Most Popular
                     </span>
-                    <span className="text-gray-500 ml-1">{plan.period}</span>
                   </div>
-                  <p className="mt-2 text-[#1B3C68]/70 text-sm">{plan.description}</p>
-                </div>
-                
-                <ul className="mb-8 space-y-3">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start">
-                      <div className={`mt-1 mr-2 flex-shrink-0 ${plan.isPopular ? 'text-[rgb(97,224,0)]' : 'text-gray-400'}`}>
-                        <Check size={16} />
-                      </div>
-                      <span className="text-[#1B3C68]/80 text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <div className="mt-auto">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`
-                      w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center
-                      ${plan.isPopular
-                        ? 'bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] text-white' 
-                        : 'bg-white border-2 border-[rgb(97,224,0)]/20 text-[#1B3C68] hover:bg-[rgb(97,224,0)]/5 transition-colors'}
-                    `}
-                  >
-                    <span>Schedule a Consultation</span>
-                    <ArrowRight size={16} className="ml-2" />
-                  </motion.button>
-                </div>
-                
-                {plan.isPopular && (
-                  <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-gradient-to-br from-[rgb(97,224,0)]/10 to-[rgb(0,218,222)]/5 z-0"></div>
                 )}
-              </motion.div>
+                <div className="flex flex-col h-full">
+                  <h3 className={`text-2xl font-bold mb-2 parallax-content ${plan.highlighted ? 'text-foreground' : 'text-heading-color'}`}>
+                    {plan.name}
+                  </h3>
+                  <p className={`mb-6 parallax-content ${plan.highlighted ? 'text-foreground/80' : 'text-text-secondary'}`}>
+                    {plan.description}
+                  </p>
+                  
+                  <div className="mb-6 parallax-content">
+                    <span className={`text-3xl font-bold ${plan.highlighted ? 'text-foreground' : 'text-heading-color'}`}>
+                      ${plan.price}
+                    </span>
+                    <span className={`text-sm ${plan.highlighted ? 'text-foreground/80' : 'text-text-secondary'}`}>
+                      {plan.perText}
+                    </span>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8 flex-grow">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start parallax-content">
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className={`h-5 w-5 mr-2 flex-shrink-0 ${plan.highlighted ? 'text-foreground' : 'text-primary'}`} 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className={plan.highlighted ? 'text-foreground/90' : 'text-text-secondary'}>
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <div className="mt-8">
+                    <button 
+                      onClick={() => openContactModal(plan.name)}
+                      className={`
+                        w-full py-3 px-6 rounded-lg text-center font-medium transition-colors
+                        ${plan.highlighted 
+                          ? 'bg-primary text-foreground hover:bg-primary-hover' 
+                          : 'bg-secondary text-foreground hover:bg-primary/80'}
+                      `}
+                    >
+                      Order Now
+                    </button>
+                  </div>
+                </div>
+              </AnimatedCard>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mt-12 text-center">
-            <p className="text-[#1B3C68]/70 text-sm max-w-2xl mx-auto">
-              All plans include 24/7 infrastructure monitoring, regular security patches, and our satisfaction guarantee. 
-              Contact us for custom requirements or to discuss enterprise-level solutions.
+      {/* IT Consulting Plans */}
+      <section className="w-full py-20 px-4 bg-secondary">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-16 text-center animate-on-scroll opacity-0 text-heading-color">
+            IT Consulting Services
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {consultingPlans.map((plan, index) => (
+              <AnimatedCard 
+                key={index} 
+                className={`
+                  h-full relative p-8 rounded-2xl
+                  ${plan.highlighted ? 
+                    'bg-primary border-2 border-primary' : 
+                    'bg-background border border-primary/20'}
+                `}
+              >
+                {plan.highlighted && (
+                  <div className="absolute -top-4 left-0 right-0 text-center">
+                    <span className="bg-secondary text-foreground text-sm font-medium px-4 py-1 rounded-full shadow-lg">
+                      Recommended
+                    </span>
+                  </div>
+                )}
+                <div className="flex flex-col h-full">
+                  <h3 className={`text-2xl font-bold mb-2 parallax-content ${plan.highlighted ? 'text-foreground' : 'text-heading-color'}`}>
+                    {plan.name}
+                  </h3>
+                  <p className={`mb-6 parallax-content ${plan.highlighted ? 'text-foreground/80' : 'text-text-secondary'}`}>
+                    {plan.description}
+                  </p>
+                  
+                  <div className="mb-6 parallax-content">
+                    <span className={`text-3xl font-bold ${plan.highlighted ? 'text-foreground' : 'text-heading-color'}`}>
+                      ${plan.price}
+                    </span>
+                    <span className={`text-sm ${plan.highlighted ? 'text-foreground/80' : 'text-text-secondary'}`}>
+                      {plan.price === 'Custom' ? '' : ' one-time'}
+                    </span>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8 flex-grow">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start parallax-content">
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className={`h-5 w-5 mr-2 flex-shrink-0 ${plan.highlighted ? 'text-foreground' : 'text-primary'}`} 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className={plan.highlighted ? 'text-foreground/90' : 'text-text-secondary'}>
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <div className="mt-8">
+                    <button 
+                      onClick={() => openContactModal(plan.name)}
+                      className={`
+                        w-full py-3 px-6 rounded-lg text-center font-medium transition-colors
+                        ${plan.highlighted 
+                          ? 'bg-primary text-foreground hover:bg-primary-hover' 
+                          : 'bg-secondary text-foreground hover:bg-primary/80'}
+                      `}
+                    >
+                      Order Now
+                    </button>
+                  </div>
+                </div>
+              </AnimatedCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="w-full py-24 px-4 bg-background">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-heading-color animate-on-scroll opacity-0">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-4 text-lg text-text-secondary max-w-3xl mx-auto animate-on-scroll opacity-0">
+              Common questions about our IT services and solutions
             </p>
           </div>
-        </section>
-        
-        {/* Dark background section between pricing and testimonials */}
-        <section className="py-16 relative overflow-hidden mb-20">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1B3C68] to-[#2a4a75]"></div>
-          <motion.div 
-            className="absolute inset-0"
-            style={{
-              backgroundImage: "radial-gradient(circle at 30% 20%, rgba(97, 224, 0, 0.2), transparent 40%), radial-gradient(circle at 70% 60%, rgba(0, 218, 222, 0.2), transparent 40%)",
-            }}
-          />
-          {/* Circuit lines */}
-          <div className="absolute inset-0 opacity-10 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-circuit-pattern"></div>
-          </div>
           
-          <div className="container mx-auto px-4 relative z-10 max-w-[1280px]">
-            <div className="text-center mb-8">
-              <h2 className="heading-2 text-white mb-4">Ready for Reliable IT Support?</h2>
-              <p className="body-large text-white/80 max-w-2xl mx-auto mb-8">
-                Get the expert IT services your business needs to stay competitive and secure in today's digital landscape
-              </p>
-              
-              <Link href="/contact">
-                <motion.button 
-                  whileHover={{ scale: 1.03, boxShadow: "0 0 15px rgba(97, 224, 0, 0.5)" }}
-                  whileTap={{ scale: 0.98 }}
-                  className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium transition-all bg-gradient-to-r from-[rgb(97,224,0)] to-[rgb(0,218,222)] rounded-lg text-white shadow-lg"
-                >
-                  <span className="relative flex items-center">
-                    Contact Our Team Today
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </span>
-                </motion.button>
-              </Link>
+          <div className="space-y-6">
+            {faqs.map((faq, index) => (
+              <div key={index} className="bg-secondary rounded-2xl p-6 animate-on-scroll opacity-0">
+                <h3 className="text-xl font-semibold mb-3 text-foreground">{faq.question}</h3>
+                <p className="text-text-secondary">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Custom Pricing CTA */}
+      <section className="w-full py-16 px-4 bg-background border-t border-primary/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="animate-on-scroll opacity-0">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-heading-color">
+              Need a Custom Solution?
+            </h2>
+            <p className="text-text-secondary mb-8 max-w-2xl mx-auto">
+              Our team can create tailored IT solutions that perfectly fit your business requirements and budget.
+            </p>
+            <button
+              onClick={() => openContactModal('Custom Solution')}
+              className="py-4 px-8 bg-primary text-foreground rounded-full font-medium hover:shadow-lg hover:shadow-primary/20 transition-all"
+            >
+              Request Custom Pricing
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Modal */}
+      {showContactModal && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-background border border-primary/20 rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {formSubmitted ? (
+                <div className="text-center py-10">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-heading-color">Thank You!</h3>
+                  <p className="text-text-secondary mb-6">
+                    We've received your request for the <strong>{selectedPlan}</strong> plan. Our team will contact you shortly to discuss the next steps.
+                  </p>
+                  <button 
+                    onClick={() => setShowContactModal(false)}
+                    className="px-6 py-2 bg-primary text-foreground rounded-full font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="mr-3 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                        {pricingIcon}
+                      </div>
+                      <h3 className="text-xl font-bold text-heading-color">Contact Us</h3>
+                    </div>
+                    <button 
+                      onClick={() => setShowContactModal(false)}
+                      className="text-text-secondary hover:text-foreground"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p className="text-text-secondary mb-6">
+                    Complete the form below to get in touch about the <strong>{selectedPlan}</strong> plan.
+                  </p>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <input type="hidden" name="plan" value={formData.plan} />
+                    
+                    <div>
+                      <label htmlFor="name" className="block mb-1 text-sm font-medium text-heading-color">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-primary/20 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                        required
+                        placeholder="Your name"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="email" className="block mb-1 text-sm font-medium text-heading-color">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-primary/20 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                        required
+                        placeholder="your.email@example.com"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="phone" className="block mb-1 text-sm font-medium text-heading-color">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-primary/20 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                        placeholder="+1 (123) 456-7890"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="message" className="block mb-1 text-sm font-medium text-heading-color">
+                        Additional Information
+                      </label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-primary/20 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 text-foreground"
+                        rows={3}
+                        placeholder="Any specific requirements or questions?"
+                      ></textarea>
+                    </div>
+                    
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        className="w-full py-3 px-6 bg-primary text-foreground rounded-full font-medium hover:shadow-lg hover:shadow-primary/20 transition-all"
+                      >
+                        Submit Request
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
             </div>
           </div>
-        </section>
-        
-        <section className="bg-gray-50 rounded-2xl mb-20">
-          <div className="py-8 md:py-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 gradient-text">What Our Clients Say</h2>
-            <AnimatedTestimonials testimonials={testimonials} autoplay={true} />
-          </div>
-        </section>
-      </main>
-      
-      <style jsx global>{`
-        .bg-circuit-pattern {
-          background-image: url('/images/circuit-pattern.svg');
-          background-repeat: repeat;
-          background-size: 400px;
-        }
-        
-        .gradient-text {
-          background-image: linear-gradient(90deg, rgb(97, 224, 0) -8%, rgb(0, 218, 222) 107%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-      `}</style>
-    </>
+        </div>
+      )}
+    </main>
   );
 } 
