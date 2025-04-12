@@ -557,7 +557,7 @@ export default function Home() {
               </div>
               
               <div className="relative">
-                <div className="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                <div className="bg-[#1B3C68]/90 rounded-xl p-6 border border-white/30 backdrop-blur-sm">
                   <div className="flex items-center space-x-2 mb-6">
                     {[1, 2, 3].map((i) => (
                       <motion.div 
@@ -575,28 +575,28 @@ export default function Home() {
                         className="w-3 h-3 rounded-full bg-[rgb(97,224,0)]"
                       />
                     ))}
-                    <span className="text-white ml-2 body-small">Premium Infotech is responding...</span>
+                    <span className="text-white ml-2 body-small font-medium">Premium Infotech is responding...</span>
                   </div>
                   
                   <div className="space-y-4">
-                    <div className="bg-white/10 rounded-lg p-3 max-w-xs">
+                    <div className="bg-[#2a4a75]/90 rounded-lg p-3 max-w-xs border border-white/30">
                       <a href="https://Therencho.com" target="_blank" rel="noopener noreferrer" className="inline-block mb-1">
-                        <span className="text-xs text-white/80 hover:text-white transition-colors">The Rencho</span>
+                        <span className="text-xs text-white font-medium hover:text-[rgb(97,224,0)] transition-colors">The Rencho</span>
                       </a>
-                      <p className="body-small text-white">I'm interested in improving our company's IT security. What services do you offer?</p>
+                      <p className="body-small text-white font-medium">I'm interested in improving our company's IT security. What services do you offer?</p>
                     </div>
                     
-                    <div className="bg-gradient-to-r from-[rgb(97,224,0)]/80 to-[rgb(0,218,222)]/80 rounded-lg p-3 ml-auto max-w-xs">
-                      <p className="body-small text-white">We offer comprehensive cybersecurity solutions including threat monitoring, penetration testing, and employee training.</p>
+                    <div className="bg-[rgb(97,224,0)]/70 rounded-lg p-3 ml-auto max-w-xs">
+                      <p className="body-small text-white font-medium">We offer comprehensive cybersecurity solutions including threat monitoring, penetration testing, and employee training.</p>
                     </div>
                     
-                    <div className="bg-gradient-to-r from-[rgb(97,224,0)]/80 to-[rgb(0,218,222)]/80 rounded-lg p-3 ml-auto max-w-xs">
-                      <p className="body-small text-white">Our team can perform a security assessment to identify vulnerabilities and create a protection plan tailored to your needs.</p>
+                    <div className="bg-[rgb(97,224,0)]/70 rounded-lg p-3 ml-auto max-w-xs">
+                      <p className="body-small text-white font-medium">Our team can perform a security assessment to identify vulnerabilities and create a protection plan tailored to your needs.</p>
                     </div>
                     
                     <div className="flex justify-end">
                       <Link href="/contact">
-                        <div className="caption inline-flex items-center text-[rgb(97,224,0)] bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+                        <div className="caption inline-flex items-center text-white bg-[#2a4a75]/90 px-3 py-1.5 rounded-lg font-medium">
                           Contact Us <ChevronRight className="ml-1 h-3 w-3" />
                         </div>
                       </Link>
